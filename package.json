@@ -1,5 +1,5 @@
 {
-  "name": "Test-todo",
+  "name": "test-todo",
   "version": "1.0.0",
   "main": "script.js",
   "scripts": {
@@ -8,7 +8,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.4.8",
@@ -19,6 +18,9 @@
   },
   "jest": {
     "testEnvironment": "jsdom"
-    
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "description": ""
 }
