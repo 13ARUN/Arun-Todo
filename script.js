@@ -20,7 +20,6 @@ document.querySelectorAll('input[name="taskFilter"]').forEach(radio => {
     });
 });
 
-//* 3.3 Event listner for removing error focus on task input on typing
 
 
 //* 4.Function to render tasks 

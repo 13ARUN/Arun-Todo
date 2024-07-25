@@ -2213,8 +2213,8 @@ describe('Adding a Task', () => {
         expect(notification.textContent).toBe('Task cannot be empty!!');
 
         inputBox.dispatchEvent(new Event('input'));
-        // const style = window.getComputedStyle(inputBox);
-        //expect(inputBox.borderBottom).toBe('none');
+        const style = window.getComputedStyle(inputBox);
+        expect(style.borderBottom).toBe('none');
 
     });
 
