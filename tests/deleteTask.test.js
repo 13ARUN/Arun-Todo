@@ -23,7 +23,7 @@ beforeEach(() => {
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
-        // Clear any previous tasks
+       
         localStorage.clear();
     });
     
@@ -52,11 +52,10 @@ describe('Delete Function', () => {
 
         const tasks = JSON.parse(localStorage.getItem('tasks'));
         expect(tasks).toHaveLength(1);
-        expect(tasks[0].id).toBe('2'); // Only the second task should remain
+        expect(tasks[0].id).toBe('2');
 
-        expect(document.querySelector('#onetask-1')).toBeNull(); // The task should be removed from the UI
-        expect(document.querySelector('#onetask-2')).toBeTruthy(); // The remaining task should still be there
-
+        expect(document.querySelector('#onetask-1')).toBeNull(); 
+        expect(document.querySelector('#onetask-2')).toBeTruthy();
 
     });
 
@@ -77,8 +76,8 @@ describe('Delete Function', () => {
         cancelButton.click();
 
         const tasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(tasks).toHaveLength(1); // The task should still be present in the localStorage
-        expect(document.querySelector('#onetask-1')).toBeTruthy(); // The task should still be in the UI
+        expect(tasks).toHaveLength(1); 
+        expect(document.querySelector('#onetask-1')).toBeTruthy(); 
 
 
     });
@@ -101,9 +100,9 @@ describe('Delete Function', () => {
 
         const tasks = JSON.parse(localStorage.getItem('tasks'));
         expect(tasks).toHaveLength(2);
-        expect(tasks.some(task => task.id === '2')).toBeFalsy(); // Task 2 should be removed
-        expect(tasks.some(task => task.id === '1')).toBeTruthy(); // Task 1 should remain
-        expect(tasks.some(task => task.id === '3')).toBeTruthy(); // Task 3 should remain
+        expect(tasks.some(task => task.id === '2')).toBeFalsy(); 
+        expect(tasks.some(task => task.id === '1')).toBeTruthy(); 
+        expect(tasks.some(task => task.id === '3')).toBeTruthy(); 
     });
 
     it('should delete the last task and update the UI correctly', () => {
@@ -121,27 +120,7 @@ describe('Delete Function', () => {
         confirmButton.click();
 
         const tasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(tasks).toHaveLength(0); // No tasks should remain
-        expect(document.querySelector('#onetask-1')).toBeNull(); // The task should be removed from the UI
-    });
-
-    // it('should handle errors gracefully during deletion', () => {
-    //     const allTasks = '{"id": 1, "text": "Task 1",'; // Simulate corrupt JSON
-    //     localStorage.setItem('tasks', allTasks);
-
-    //     renderTasks();
-
-    //     deleteTask('2'); //invalid Id
-
-    //     const confirmButton = document.getElementById('confirm-button');
-    //     confirmButton.click();
-
-    //     const notification = document.querySelector('.notification');
-    //     expect(notification.textContent).toBe('Failed to delete task. Please try again.');
-    //     expect(notification.style.backgroundColor).toBe('rgb(184, 13, 13)');
-
-    //     const tasks = localStorage.getItem('tasks');
-    //     expect(tasks).toBe(allTasks); 
-    // });
-    
+        expect(tasks).toHaveLength(0); 
+        expect(document.querySelector('#onetask-1')).toBeNull(); 
+    });  
 });

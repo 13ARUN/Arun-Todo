@@ -52,20 +52,6 @@ describe('showToast', () => {
         expect(toastContainer.style.display).toBe('none');
     });
 
-
-    // it('should not display toast if required elements are missing', () => {
-
-    //     document.getElementById('toast-container').remove();
-        
-    //     const mockOnConfirm = jest.fn();
-    //     const mockOnCancel = jest.fn();
-      
-    //     showToast('Test message', mockOnConfirm, mockOnCancel);
-    
-    //     expect(mockOnConfirm).not.toHaveBeenCalled();
-    //     expect(mockOnCancel).not.toHaveBeenCalled();
-    // });
-
     it('should handle Enter and Escape key presses', () => {
 
         const mockOnConfirm = jest.fn();
@@ -119,9 +105,4 @@ describe('showToast', () => {
         expect(toastContainer.style.display).toBe('flex');
     });
 
-    
-    
-    
-    
-    
 });

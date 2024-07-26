@@ -5,7 +5,7 @@
 
 
     beforeEach(() => {
-            // Load HTML and CSS
+            
             const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
             
             document.body.innerHTML = html;
@@ -23,7 +23,7 @@
             })();
             Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
             
-            // Clear any previous tasks
+            
             localStorage.clear();
         });
         
@@ -43,7 +43,7 @@
             const confirmButton = document.getElementById('confirm-button');
             confirmButton.click();
             
-            expect(localStorage.getItem('tasks')).toBe(null); // All tasks should be cleared
+            expect(localStorage.getItem('tasks')).toBe(null); 
         });
 
         it('should clear only in-progress tasks when filter is "inprogress"', () => {
@@ -57,7 +57,7 @@
             confirmButton.click();
 
             const remainingTasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(remainingTasks.length).toBe(1); // Only completed tasks should remain
+            expect(remainingTasks.length).toBe(1); 
             expect(remainingTasks[0].completed).toBe(true);
         });
 
@@ -72,7 +72,7 @@
             confirmButton.click();
 
             const remainingTasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(remainingTasks.length).toBe(1); // Only in-progress tasks should remain
+            expect(remainingTasks.length).toBe(1); 
             expect(remainingTasks[0].completed).toBe(false);
         });
 
@@ -86,12 +86,12 @@
             const cancelButton = document.getElementById('cancel-button');
             cancelButton.click();
             
-            expect(localStorage.getItem('tasks')).not.toBe(null); // All tasks should be cleared
+            expect(localStorage.getItem('tasks')).not.toBe(null); 
         });
 
         it('should handle case where there are no tasks to clear', () => {
             
-            localStorage.setItem('tasks', JSON.stringify([])); // No tasks to clear
+            localStorage.setItem('tasks', JSON.stringify([])); 
             localStorage.setItem('statusFilter', 'all');
             
             clearTasks();
@@ -99,7 +99,7 @@
             const confirmButton = document.getElementById('confirm-button');
             confirmButton.click();
 
-            expect(localStorage.getItem('tasks')).toBeNull(); // Tasks array should remain empty
+            expect(localStorage.getItem('tasks')).toBeNull();
         });
 
         it('should display the correct confirmation message for different filters', () => {
@@ -127,7 +127,7 @@
         
         it('should reset taskIdCounter when clearing all tasks', () => {
             localStorage.setItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }]));
-            localStorage.setItem('taskIdCounter', '5'); // Simulate a task ID counter
+            localStorage.setItem('taskIdCounter', '5');
             localStorage.setItem('statusFilter', 'all');
             
             clearTasks();
@@ -135,15 +135,7 @@
             const confirmButton = document.getElementById('confirm-button');
             confirmButton.click();
 
-            expect(localStorage.getItem('taskIdCounter')).toBeNull(); // taskIdCounter should be reset
+            expect(localStorage.getItem('taskIdCounter')).toBeNull(); 
         });
-
-        
-        
-
-        
-        
-
-
 
     });

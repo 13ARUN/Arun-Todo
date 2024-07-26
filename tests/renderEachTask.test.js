@@ -21,7 +21,7 @@ beforeEach(() => {
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
-        // Clear any previous tasks
+        
         localStorage.clear();
     });
     
@@ -32,17 +32,15 @@ afterEach(() => {
 describe('renderEachTask', () => {
     
     test('should create and append a task element with correct content', () => {
-        // Create a sample task
+        
         const task = {
             id: 1,
             text: 'Sample Task',
             completed: false
         };
 
-        // Call the function to render the task
         renderEachTask(task);
 
-        // Assertions
         const taskElement = document.querySelector('.atask');
         expect(taskElement).not.toBeNull();
 
@@ -62,33 +60,29 @@ describe('renderEachTask', () => {
     });
 
     test('should apply the correct opacity based on the task completion status', () => {
-        // Create a completed task
+
         const task = {
             id: 2,
             text: 'Completed Task',
             completed: true
         };
 
-        // Call the function to render the task
         renderEachTask(task);
 
-        // Assertions
         const taskElement = document.querySelector('.atask');
         expect(taskElement.style.opacity).toBe('0.6');
     });
 
     test('should render the save/cancel buttons only when editing', () => {
-        // Create a sample task
+        
         const task = {
             id: 3,
             text: 'Editable Task',
             completed: false
         };
 
-        // Call the function to render the task
         renderEachTask(task);
 
-        // Assertions
         const saveCancelDiv = document.querySelector(`#save-${task.id}`);
         expect(saveCancelDiv.style.display).toBe('none');
     });

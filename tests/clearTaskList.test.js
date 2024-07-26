@@ -21,7 +21,7 @@ beforeEach(() => {
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
-        // Clear any previous tasks
+        
         localStorage.clear();
     });
     
@@ -55,12 +55,10 @@ describe('clearTaskList Function', () => {
 
         clearTaskList();
 
-        // Assert: Check if other elements are unaffected
         expect(document.querySelector('#other-element').textContent).toBe('This should not be cleared');
     });
 
     it('should handle an empty task list gracefully', () => {
-        // Arrange: Ensure the task list is empty
         const taskList = document.querySelector('#listtask');
         taskList.innerHTML = '';
 

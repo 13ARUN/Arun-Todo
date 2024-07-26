@@ -21,7 +21,7 @@ beforeEach(() => {
     })();
     Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
 
-    // Clear any previous tasks
+    
     localStorage.clear();
 });
 
@@ -38,11 +38,17 @@ test('toggleSave sets task text to readonly and border style to none', () => {
 
     renderTasks();
 
+    const taskText = document.querySelector(`#onetask-1`);
+
+    expect(taskText.readOnly).toBe(true);
+    
+
     toggleEdit('1');
+
+    expect(taskText.readOnly).toBe(false);
 
     toggleSave('1');
 
-    const taskText = document.querySelector(`#onetask-1`);
     expect(taskText.readOnly).toBe(true);
     expect(taskText.style.borderStyle).toBe('none');
 });

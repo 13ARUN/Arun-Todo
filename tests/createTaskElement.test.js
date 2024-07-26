@@ -3,8 +3,6 @@ const fs = require('fs');
 const path = require('path');
 
 
-
-
 beforeEach(() => {
 
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
@@ -23,7 +21,7 @@ beforeEach(() => {
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
-        // Clear any previous tasks
+        
         localStorage.clear();
     });
     

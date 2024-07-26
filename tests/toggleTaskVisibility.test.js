@@ -22,8 +22,7 @@ beforeEach(() => {
             };
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
-        
-        // Clear any previous tasks
+
         localStorage.clear();
     });
     
@@ -36,7 +35,7 @@ describe('toggleTaskVisibility Function', () => {
     let noTasks, showtask, taskActions, countDiv;
 
     beforeEach(() => {
-        // Set up the DOM elements
+       
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
         document.body.innerHTML = html;
 

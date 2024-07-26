@@ -94,16 +94,4 @@ describe('isTaskAlreadyExists Function', () => {
         expect(isTaskAlreadyExists('Task 1', -1)).toBeFalsy();
     });
 
-    // it('should return false and log an error if JSON parsing fails', () => {
-
-    //   jest.spyOn(localStorage, 'getItem').mockReturnValue('invalid JSON string');
-
-    //   // Optionally, mock console.error to verify it was called
-    //   const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    //   expect(isTaskAlreadyExists('Task 1', -1)).toBeFalsy();
-    //   expect(consoleErrorSpy).toHaveBeenCalled();
-
-    //   consoleErrorSpy.mockRestore(); 
-    // });
 });

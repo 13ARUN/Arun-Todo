@@ -23,7 +23,7 @@ beforeEach(() => {
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
-        // Clear any previous tasks
+       
         localStorage.clear();
     });
     

@@ -22,8 +22,7 @@ beforeEach(() => {
             };
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
-        
-        // Clear any previous tasks
+
         localStorage.clear();
     });
     
@@ -77,7 +76,6 @@ describe('Toggle task controls function', () => {
     
         renderTasks();
     
-        // Set both elements to hidden
         const fromDiv = document.querySelector('#edit-1');
         fromDiv.style.display = 'none';
         const toDiv = document.querySelector('#save-1');
@@ -98,7 +96,6 @@ describe('Toggle task controls function', () => {
     
         renderTasks();
     
-        // Set both elements to visible
         const fromDiv = document.querySelector('#edit-1');
         fromDiv.style.display = 'flex';
         const toDiv = document.querySelector('#save-1');

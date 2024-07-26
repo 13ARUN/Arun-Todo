@@ -310,14 +310,6 @@ describe('Adding a Task', () => {
 
 describe('filter a Task', () => {
 
-    
-
-   
-
-    
-    
-
-    //? Integration tests
 
     it('should filter tasks based on status', () => {
         const inputBox = document.querySelector('#input');
