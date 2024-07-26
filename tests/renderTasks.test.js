@@ -1,25 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const { renderTasks } = require('../script.js');
 
-describe('renderTasks', () => {
-    beforeEach(() => {
-        // Load HTML and CSS
+
+beforeEach(() => {
+
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
-        const cssContent = fs.readFileSync(path.resolve(__dirname, '../css/style.css'), 'utf8');
         
         document.body.innerHTML = html;
-        
-        const styleElement = document.createElement('style');
-        styleElement.textContent = cssContent;
-        document.head.appendChild(styleElement);
-        
         require('../script.js');
-        
-        jest.resetModules();
-        
-        // Mock localStorage
+
         const mockLocalStorage = (() => {
             let store = {};
             return {
@@ -29,17 +19,17 @@ describe('renderTasks', () => {
                 removeItem: (key) => delete store[key],
             };
         })();
-        Object.defineProperty(window, 'localStorage', {
-            value: mockLocalStorage,
-        });
+        Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
         // Clear any previous tasks
         localStorage.clear();
     });
     
-    afterEach(() => {
-        localStorage.clear();
-    });
+afterEach(() => {
+    localStorage.clear();
+});
+
+describe('renderTasks', () => {
     
     test('should render tasks from localStorage', () => {
         // Prepare localStorage with sample tasks

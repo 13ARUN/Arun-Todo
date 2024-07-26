@@ -14,7 +14,7 @@ beforeEach(() => {
         styleElement.textContent = cssContent;
         document.head.appendChild(styleElement);
         
-        require('../script.js');
+        
         
         jest.resetModules();
         
@@ -155,11 +155,6 @@ describe('HTML-Task Input Section', () => {
         expect(taskInputDiv.contains(form)).toBe(true);
     });
 
-    it('should have a onsubmit function in form tag', () => {
-        const form = document.querySelector('form');
-    
-        expect(form.getAttribute('onsubmit')).toBe('event.preventDefault(); addTask();');
-    });
 
     it('should have a input and button tag inside form', () => {
         const form= document.querySelector('form');
@@ -260,7 +255,6 @@ describe('HTML-Task Filter Section', () => {
         const allRadioBtn = document.querySelector('#all'); 
 
         expect(allRadioBtn.getAttribute('value')).toBe('all');
-        expect(allRadioBtn.getAttribute('onchange')).toBe("filterTasks('all')");   
     });
 
     it('should have `all` label text content as "All" and attributes as "for:all, title:All" ', () => {
@@ -286,7 +280,6 @@ describe('HTML-Task Filter Section', () => {
         const inprogressRadioBtn = document.querySelector('#inprogress'); 
 
         expect(inprogressRadioBtn.getAttribute('value')).toBe('inprogress');
-        expect(inprogressRadioBtn.getAttribute('onchange')).toBe("filterTasks('inprogress')");   
     });
 
     it('should have `inprogress` label text content as "inprogress" and attributes as "for:inprogress, title:inprogress" ', () => {
@@ -311,8 +304,7 @@ describe('HTML-Task Filter Section', () => {
     it('should have `in progress` input button with the attributes "value:completed" and onchange parameter as "completed"', () =>{
         const completedRadioBtn = document.querySelector('#completed'); 
 
-        expect(completedRadioBtn.getAttribute('value')).toBe('completed');
-        expect(completedRadioBtn.getAttribute('onchange')).toBe("filterTasks('completed')");   
+        expect(completedRadioBtn.getAttribute('value')).toBe('completed');   
     });
 
     it('should have `completed` label text content as "completed" and attributes as "for:completed, title:completed" ', () => {
@@ -422,8 +414,7 @@ describe('HTML-Task Count and Clear Section', () => {
     it('should have a clear button with attributes "title:Clear, onclick function: clearTask" ', () => {
         const clearBtn = document.querySelector('.clear #clear');
 
-        expect(clearBtn.getAttribute('title')).toBe('Clear');
-        expect(clearBtn.getAttribute('onclick')).toBe('clearTasks()'); 
+        expect(clearBtn.getAttribute('title')).toBe('Clear'); 
     });
 
     it('should have a text content of clear button as "Clear Tasks"', () => {

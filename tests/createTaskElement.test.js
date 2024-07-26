@@ -1,24 +1,17 @@
+
 const fs = require('fs');
 const path = require('path');
 
-const { createTaskElement } = require('../script.js');
+
+
 
 beforeEach(() => {
-        // Load HTML and CSS
+
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
-        const cssContent = fs.readFileSync(path.resolve(__dirname, '../css/style.css'), 'utf8');
         
         document.body.innerHTML = html;
-        
-        const styleElement = document.createElement('style');
-        styleElement.textContent = cssContent;
-        document.head.appendChild(styleElement);
-        
         require('../script.js');
-        
-        jest.resetModules();
-        
-        // Mock localStorage
+
         const mockLocalStorage = (() => {
             let store = {};
             return {
@@ -28,9 +21,7 @@ beforeEach(() => {
                 removeItem: (key) => delete store[key],
             };
         })();
-        Object.defineProperty(window, 'localStorage', {
-            value: mockLocalStorage,
-        });
+        Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
         // Clear any previous tasks
         localStorage.clear();
@@ -95,29 +86,29 @@ describe('createTaskElement Function', () => {
         expect(taskElement.querySelector('button[title="Status"]').querySelector('img').src).toContain('img/done.png');
     });
 
-    // it('should correctly display Save and Cancel buttons when toggled', () => {
+    it('should correctly display Save and Cancel buttons when toggled', () => {
         
-    //     const task = {
-    //         id: 4,
-    //         text: 'Task to be edited',
-    //         completed: false
-    //     };
+        const task = {
+            id: 4,
+            text: 'Task to be edited',
+            completed: false
+        };
        
-    //     const taskElement = createTaskElement(task);
-    //     const taskList = document.querySelector('#listtask');
+        const taskElement = createTaskElement(task);
+        const taskList = document.querySelector('#listtask');
 
-    //     taskList.appendChild(taskElement);
+        taskList.appendChild(taskElement);
 
 
-    //     const editButton = taskElement.querySelector('button[title="Edit Task"]');
-    //     editButton.click();
+        const editButton = taskElement.querySelector('button[title="Edit Task"]');
+        editButton.click();
 
-    //     expect(taskElement.querySelector('button[title="Save Task"]')).toBeTruthy();
-    //     expect(taskElement.querySelector('button[title="Cancel Edit"]')).toBeTruthy();
+        expect(taskElement.querySelector('button[title="Save Task"]')).toBeTruthy();
+        expect(taskElement.querySelector('button[title="Cancel Edit"]')).toBeTruthy();
         
-    //     const saveDiv = taskElement.querySelector(`#save-${task.id}`);
-    //     const style = window.getComputedStyle(saveDiv);
-    //     expect(style.display).toBe("flex");
-    // });
+        const saveDiv = taskElement.querySelector(`#save-${task.id}`);
+        const style = window.getComputedStyle(saveDiv);
+        expect(style.display).toBe("flex");
+    });
 
 });

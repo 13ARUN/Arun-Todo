@@ -1,25 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const { renderTask } = require('../script.js');
 
-describe('renderTask', () => {
-    beforeEach(() => {
-        // Load HTML and CSS
+
+beforeEach(() => {
+
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
-        const cssContent = fs.readFileSync(path.resolve(__dirname, '../css/style.css'), 'utf8');
         
         document.body.innerHTML = html;
-        
-        const styleElement = document.createElement('style');
-        styleElement.textContent = cssContent;
-        document.head.appendChild(styleElement);
-        
         require('../script.js');
-        
-        jest.resetModules();
-        
-        // Mock localStorage
+
         const mockLocalStorage = (() => {
             let store = {};
             return {
@@ -29,17 +19,17 @@ describe('renderTask', () => {
                 removeItem: (key) => delete store[key],
             };
         })();
-        Object.defineProperty(window, 'localStorage', {
-            value: mockLocalStorage,
-        });
+        Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
         // Clear any previous tasks
         localStorage.clear();
     });
     
-    afterEach(() => {
-        localStorage.clear();
-    });
+afterEach(() => {
+    localStorage.clear();
+});
+
+describe('renderEachTask', () => {
     
     test('should create and append a task element with correct content', () => {
         // Create a sample task
@@ -50,7 +40,7 @@ describe('renderTask', () => {
         };
 
         // Call the function to render the task
-        renderTask(task);
+        renderEachTask(task);
 
         // Assertions
         const taskElement = document.querySelector('.atask');
@@ -80,7 +70,7 @@ describe('renderTask', () => {
         };
 
         // Call the function to render the task
-        renderTask(task);
+        renderEachTask(task);
 
         // Assertions
         const taskElement = document.querySelector('.atask');
@@ -96,7 +86,7 @@ describe('renderTask', () => {
         };
 
         // Call the function to render the task
-        renderTask(task);
+        renderEachTask(task);
 
         // Assertions
         const saveCancelDiv = document.querySelector(`#save-${task.id}`);

@@ -1,76 +1,91 @@
-// validateInput.test.js
 const fs = require('fs');
 const path = require('path');
-// Import the function to be tested and the notification function
-const { validateInput, isTaskAlreadyExists, showNotification } = require('./../script.js'); // Adjust the path accordingly
 
-// Mock the isTaskAlreadyExists and showNotification functions
-jest.mock('./../script.js', () => ({
-    ...jest.requireActual('./../script.js'),
-    isTaskAlreadyExists: jest.fn(),
-    showNotification: jest.fn()
-}));
 
-describe('validateInput', () => {
 
-    beforeEach(() => {
+
+beforeEach(() => {
 
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
-        const cssContent = fs.readFileSync(path.resolve(__dirname, '../css/style.css'), 'utf8');
         
         document.body.innerHTML = html;
-        
-        const styleElement = document.createElement('style');
-        styleElement.textContent = cssContent;
-        document.head.appendChild(styleElement);
-        
-        //require('../script.js');
-        
-        jest.resetModules();
 
-        jest.clearAllMocks(); // Clear previous mock calls before each test
+        require('../script.js');
+
+        const mockLocalStorage = (() => {
+            let store = {};
+            return {
+                getItem: (key) => store[key] || null,
+                setItem: (key, value) => (store[key] = value.toString()),
+                clear: () => (store = {}),
+                removeItem: (key) => delete store[key],
+            };
+        })();
+        Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
+        
+        // Clear any previous tasks
+        localStorage.clear();
     });
+    
+afterEach(() => {
+    localStorage.clear();
+});
 
-    test('should return false if input is empty and call showNotification', () => {
-        const result = validateInput('');
+describe('validateInput function', () => {
+
+        
+    
+    it('should return false if input is empty', () => {
+        // Arrange
+        const inputValue = '';
+        const existingTasks = [];
+
+        // Act
+        const result = validateInput(inputValue, existingTasks);
+
+        // Assert
         expect(result).toBe(false);
-        //expect(showNotification).toHaveBeenCalledWith('Task cannot be empty!!', '#b80d0d');
+        
     });
 
-    test('should return false if input contains only spaces and call showNotification', () => {
-        const result = validateInput('   ');
+    it('should return false  if input is only whitespace', () => {
+        // Arrange
+        const inputValue = '   ';
+        const existingTasks = [];
+
+        // Act
+        const result = validateInput(inputValue, existingTasks);
+
+        // Assert
         expect(result).toBe(false);
-        //expect(showNotification).toHaveBeenCalledWith('Task cannot contain only spaces!', '#b80d0d');
+        
     });
 
-    test('should return false if task already exists and call showNotification', () => {
-        // Mocking isTaskAlreadyExists to return true
-        isTaskAlreadyExists.mockReturnValue(true);
+    // //TODO
+    // it('should return false and show notification if task already exists', () => {
 
-        const result = validateInput('Existing Task', 1);
-        //expect(result).toBe(false);
-        //expect(isTaskAlreadyExists).toHaveBeenCalledWith('Existing Task', 1);
-        //expect(showNotification).toHaveBeenCalledWith('Task already exists!', '#b80d0d');
-    });
+    //     const inputValue = 'Existing Task';
+    //     const existingTasks = [{ text: 'Existing Task' }];
 
-    test('should return true if input is valid and task does not exist', () => {
-        // Mocking isTaskAlreadyExists to return false
-        isTaskAlreadyExists.mockReturnValue(false);
+    //     // Act
+    //     const result = validateInput(inputValue, existingTasks);
 
-        const result = validateInput('New Task');
+    //     // Assert
+    //     expect(result).toBe(false);
+        
+    // });
+
+    it('should return true if input is valid and unique', () => {
+        // Arrange
+        const inputValue = 'Unique Task';
+        const existingTasks = [{ text: 'Other Task' }];
+
+        // Act
+        const result = validateInput(inputValue, existingTasks);
+
+        // Assert
         expect(result).toBe(true);
-        //expect(isTaskAlreadyExists).toHaveBeenCalledWith('New Task', -1); // Default value for currentId
-        expect(showNotification).not.toHaveBeenCalled();
-    });
-
-    test('should return true if input is valid and task does not exist with a specific id', () => {
-        // Mocking isTaskAlreadyExists to return false
-        isTaskAlreadyExists.mockReturnValue(false);
-
-        const result = validateInput('New Task', 2);
-        expect(result).toBe(true);
-        //expect(isTaskAlreadyExists).toHaveBeenCalledWith('New Task', 2);
-        expect(showNotification).not.toHaveBeenCalled();
+        
     });
 
 });

@@ -1,24 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 
-const { displayTaskCounts } = require('../script.js');
+
+
 
 beforeEach(() => {
-        // Load HTML and CSS
+
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
-        const cssContent = fs.readFileSync(path.resolve(__dirname, '../css/style.css'), 'utf8');
         
         document.body.innerHTML = html;
-        
-        const styleElement = document.createElement('style');
-        styleElement.textContent = cssContent;
-        document.head.appendChild(styleElement);
-        
+
         require('../script.js');
-        
-        jest.resetModules();
-        
-        // Mock localStorage
+
         const mockLocalStorage = (() => {
             let store = {};
             return {
@@ -28,9 +21,7 @@ beforeEach(() => {
                 removeItem: (key) => delete store[key],
             };
         })();
-        Object.defineProperty(window, 'localStorage', {
-            value: mockLocalStorage,
-        });
+        Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
         // Clear any previous tasks
         localStorage.clear();
@@ -41,6 +32,18 @@ afterEach(() => {
 });
 
 describe('displayTaskCounts Function', () => {
+
+    it('should display "You have no tasks here!" for an empty task array with filter "all"', () => {
+        
+        const countDiv = document.querySelector('.count h3');
+
+        const tasks = [];
+        const filter = 'none';
+
+        displayTaskCounts(tasks, filter);
+
+        expect(countDiv.textContent).toBe('You have no tasks here!');
+    });
 
     it('should display "You have no tasks here!" for an empty task array with filter "all"', () => {
         

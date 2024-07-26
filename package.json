@@ -19,8 +19,5 @@
   "jest": {
     "testEnvironment": "jsdom"
   },
-  "directories": {
-    "test": "tests"
-  },
   "description": ""
 }

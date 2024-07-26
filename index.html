@@ -22,7 +22,7 @@
             <!--* 1.2 Task Input Field -->
             <div class="taskfield">
                 <div class="taskinput">
-                    <form onsubmit="event.preventDefault(); addTask();">
+                    <form>
                         <input type="text" id="input" placeholder="Enter your tasks..." maxlength="150" autocomplete="off">
                         
                         <button type="submit" title="Add" id="add" > <img src="img/taskadd.png" alt="add icon"></button>   
@@ -35,15 +35,15 @@
             <div class="tasktext">
                 <!-- Task count display -->
                 <div class="taskfilterclr">
-                    <input type="radio" name="taskFilter" id="all" value="all" onchange="filterTasks('all')" >
+                    <input type="radio" name="taskFilter" id="all" value="all" >
                     <label id="labelall" for="all" title="All">All</label>
                 
                     
-                    <input type="radio" name="taskFilter" id="inprogress" value="inprogress" onchange="filterTasks('inprogress')">
+                    <input type="radio" name="taskFilter" id="inprogress" value="inprogress" >
                     <label id="labelinprogress" for="inprogress" title="In Progress">In Progress</label>
                     
                 
-                    <input type="radio" name="taskFilter" id="completed" value="completed" onchange="filterTasks('completed')">
+                    <input type="radio" name="taskFilter" id="completed" value="completed">
                     <label id="labelcompleted" for="completed" title="Completed">Completed</label>
                 
                 </div>
@@ -65,11 +65,7 @@
             <!--* 1.5 Task List Section -->
             <div class="tasklist" > <!-- Initially hidden -->
                 <div class="taskdisplay">
-                    <ul id="listtask">
-                        <!--* 1.6 atask-->
-                        <!--* Tasks will be added here as atask div -->
-                        
-                    </ul>
+                    <ul id="listtask"></ul>
                 </div>
             </div>
 
@@ -79,7 +75,7 @@
                 <div class="count">
                     <h3>You have no tasks here!</h3>
                 </div> 
-                <button title="Clear" id="clear" onclick="clearTasks()">Clear Tasks</button> <!-- Clear all tasks button -->
+                <button title="Clear" id="clear">Clear Tasks</button> <!-- Clear all tasks button -->
             </div>
            
         </div>
