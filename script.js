@@ -8,7 +8,7 @@ const inputBox = document.querySelector('#input'), //? Task input field
 
 //* 2.Global variable for saving task with ID in local storage
 
-let taskIdCounter = localStorage.getItem('taskIdCounter') ? parseInt(localStorage.getItem('taskIdCounter')) : 0; //? ID counter variable for tasks
+let taskIdCounter = parseInt(localStorage.getItem('taskIdCounter')) || 0; //? ID counter variable for tasks
 
 //* 3.Event listeners
 
