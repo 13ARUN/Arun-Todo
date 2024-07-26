@@ -361,7 +361,7 @@ describe('Deleting a Task', () => {
         const deleteButton = document.querySelector(`#edit-${taskId} button[title="Delete Task"]`);
         deleteButton.click();
     
-        // Simulate user confirming the deletion
+    
         const confirmButton = document.getElementById('confirm-button');
         confirmButton.click();
     
@@ -382,7 +382,7 @@ describe('Deleting a Task', () => {
         const deleteButton = document.querySelector(`#edit-${taskId} button[title="Delete Task"]`);
         deleteButton.click();
     
-        // Simulate user confirming the deletion
+        
         const cancelButton = document.getElementById('cancel-button');
         cancelButton.click();
     
@@ -411,6 +411,12 @@ describe('Editing a Task', () => {
     
         const tasks = JSON.parse(localStorage.getItem('tasks'));
         const taskId = tasks[0].id;
+
+        const aTask = document.querySelector(`#onetask-1`)
+
+        expect(taskList.textContent).not.toBeNull();
+        expect(taskList.children).toHaveLength(1);
+        expect(aTask.value).toBe('Task to be edited');
     
         const editButton = document.querySelector(`#edit-${taskId} button[title="Edit Task"]`);
         editButton.click();
@@ -418,8 +424,6 @@ describe('Editing a Task', () => {
         const editBox =  document.querySelector(`#onetask-${taskId}`);
         editBox.value = 'Task edited';
 
-
-        //editBox.dispatchEvent(new Event('input'));
         fireEvent.input(editBox);
 
         const saveButton = document.querySelector(`#save-${taskId} button[title="Save Task"]`);
@@ -430,7 +434,11 @@ describe('Editing a Task', () => {
         
     
         const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(updatedTasks[0].text).toBe('Task edited')
+        expect(updatedTasks[0].text).toBe('Task edited');
+
+        expect(taskList.textContent).not.toBeNull();
+        expect(taskList.children).toHaveLength(1);
+        expect(aTask.value).toBe('Task edited');
 
         
     });
@@ -487,7 +495,13 @@ describe('Editing a Task', () => {
         cancelButton.click();
     
         const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(updatedTasks[0].text).toBe('Task to be edited')
+        expect(updatedTasks[0].text).toBe('Task to be edited');
+
+        const aTask = document.querySelector(`#onetask-1`);
+
+        expect(taskList.textContent).not.toBeNull();
+        expect(taskList.children).toHaveLength(1);
+        expect(aTask.value).toBe('Task to be edited');
 
         
     });
@@ -515,12 +529,18 @@ describe('Editing a Task', () => {
         expect(notification.textContent).toBe('Task cannot be empty!!');
     
         const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(updatedTasks[0].text).toBe('Task to be edited')
+        expect(updatedTasks[0].text).toBe('Task to be edited');
+
+        const aTask = document.querySelector(`#onetask-1`)
+
+        expect(taskList.textContent).not.toBeNull();
+        expect(taskList.children).toHaveLength(1);
+        expect(aTask.value).toBe('');
 
         
     });
 
-    it('should edit a task to a task that already exists', () => {
+    it('should not edit a task to a task that already exists', () => {
         const inputBox = document.querySelector('#input');
         const addButton = document.querySelector('#add');
     
@@ -546,7 +566,13 @@ describe('Editing a Task', () => {
         expect(notification.textContent).toBe('Task already exists!');
     
         const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(updatedTasks[0].text).toBe('Existing Task')
+        expect(updatedTasks[0].text).toBe('Existing Task');
+
+        const aTask = document.querySelector(`#onetask-1`)
+
+        expect(taskList.textContent).not.toBeNull();
+        expect(taskList.children).toHaveLength(2);
+        expect(aTask.value).toBe('Existing Task');
 
         
     });
@@ -572,6 +598,12 @@ describe('Editing a Task', () => {
 
         const notification = document.querySelector('.notification');
         expect(notification.textContent).toBe('Cannot edit completed task!');
+
+        const aTask = document.querySelector(`#onetask-1`)
+
+        expect(taskList.textContent).not.toBeNull();
+        expect(taskList.children).toHaveLength(1);
+        expect(aTask.value).toBe('Task 1');
 
 
          
@@ -603,9 +635,14 @@ describe('Cancel editing of Task', () => {
         cancelButton.click();
     
         const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(updatedTasks[0].text).toBe('Task to be edited')
+        expect(updatedTasks[0].text).toBe('Task to be edited');
 
-        
+        const aTask = document.querySelector(`#onetask-1`)
+
+        expect(taskList.textContent).not.toBeNull();
+        expect(taskList.children).toHaveLength(1);
+        expect(aTask.value).toBe('Task to be edited');
+    
     });
 
 
@@ -673,6 +710,14 @@ describe('Clear tasks', () => {
         const tasks = JSON.parse(localStorage.getItem('tasks'));
         expect(tasks).toBeNull()
 
+        
+
+        expect(taskList.textContent).toBe('')
+        
+        
+        ;
+        
+
     });
 
     it('should not clear all tasks when canceled', () => {
@@ -691,7 +736,15 @@ describe('Clear tasks', () => {
         cancelButton.click();
 
         const tasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(tasks[0].text).toBe('Task 1')
+        expect(tasks[0].text).toBe('Task 1');
+
+        const aTask = document.querySelector(`#onetask-1`)
+
+        expect(taskList.textContent).not.toBeNull();
+        expect(taskList.children).toHaveLength(1);
+        expect(aTask.value).toBe('Task 1');
+
+
 
     });
 
@@ -725,6 +778,8 @@ describe('Clear tasks', () => {
         const tasksclear = JSON.parse(localStorage.getItem('tasks'));
         expect(tasksclear).toHaveLength(1);
         expect(tasksclear[0].text).toBe('Task 1')
+
+        
         
         
 
@@ -765,10 +820,6 @@ describe('Clear tasks', () => {
         
 
     });
-
-
-
-
 
 });
 
