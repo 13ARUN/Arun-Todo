@@ -29,26 +29,31 @@ afterEach(() => {
     localStorage.clear();
 });
 
-test('toggleSave sets task text to readonly and border style to none', () => {
-    const sampleTasks = [
-        { id: '1', text: 'Old Task Text', completed: false }
-    ];
-    localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-    localStorage.setItem('taskIdCounter', '1');
+describe('ToggleSave function', () => {
 
-    renderTasks();
-
-    const taskText = document.querySelector(`#onetask-1`);
-
-    expect(taskText.readOnly).toBe(true);
+    it('toggleSave sets task text to readonly and border style to none', () => {
+        const sampleTasks = [
+            { id: '1', text: 'Old Task Text', completed: false }
+        ];
+        localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+        localStorage.setItem('taskIdCounter', '1');
     
-
-    toggleEdit('1');
-
-    expect(taskText.readOnly).toBe(false);
-
-    toggleSave('1');
-
-    expect(taskText.readOnly).toBe(true);
-    expect(taskText.style.borderStyle).toBe('none');
+        renderTasks();
+    
+        const taskText = document.querySelector(`#onetask-1`);
+    
+        expect(taskText.readOnly).toBe(true);
+        
+    
+        toggleEdit('1');
+    
+        expect(taskText.readOnly).toBe(false);
+    
+        toggleSave('1');
+    
+        expect(taskText.readOnly).toBe(true);
+        expect(taskText.style.borderStyle).toBe('none');
+    });
 });
+
+

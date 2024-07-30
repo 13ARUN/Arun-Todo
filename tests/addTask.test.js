@@ -27,8 +27,6 @@ beforeEach(() => {
     
 afterEach(() => {
     localStorage.clear();
-    document.body.innerHTML = '';
-
 });
 
 describe('AddTask Function', () => {

@@ -536,54 +536,22 @@ function showNotification(text = 'Notification', color = 'blue') {
     }, 2000);
 }
 
-
-
-
-// Function to show toast message with confirmation and cancellation
 function showToast(message, onConfirm, onCancel) {
-    const toastContainer = document.getElementById('toast-container');
     const messageText = document.getElementById('message-text');
     const confirmButton = document.getElementById('confirm-button');
     const cancelButton = document.getElementById('cancel-button');
 
-
-
-    // Show the toast
     toggleToast(true);
     messageText.textContent = message;
 
-    // Function to handle key presses
-    function handleKeyPress(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            onConfirm();
-            toggleToast(false);
-            document.removeEventListener('keydown', handleKeyPress);
-        } else if (event.key === 'Escape') {
-            event.preventDefault();
-            onCancel();
-            toggleToast(false);
-            document.removeEventListener('keydown', handleKeyPress);
-        }else {
-            //console.log(`Unhandled key press: ${event.key}`);
-            return;
-        }
-    }
-
-    // Add key press event listener
-    document.addEventListener('keydown', handleKeyPress);
-
-    // Set click handlers for confirm and cancel buttons
     confirmButton.onclick = () => {
         onConfirm();
         toggleToast(false);
-        document.removeEventListener('keydown', handleKeyPress);
     };
 
     cancelButton.onclick = () => {
         onCancel();
         toggleToast(false);
-        document.removeEventListener('keydown', handleKeyPress);
     };
 }
 

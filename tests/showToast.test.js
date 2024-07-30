@@ -52,46 +52,6 @@ describe('showToast', () => {
         expect(toastContainer.style.display).toBe('none');
     });
 
-    it('should handle Enter and Escape key presses', () => {
-
-        const mockOnConfirm = jest.fn();
-        const mockOnCancel = jest.fn();
-    
-        showToast('Test message', mockOnConfirm, mockOnCancel);
-    
-        const eventEnter = new KeyboardEvent('keydown', { key: 'Enter' });
-        document.dispatchEvent(eventEnter);
-        expect(mockOnConfirm).toHaveBeenCalled();
-        expect(document.getElementById('toast-container').style.display).toBe('none');
-    
-        // Reset mocks and test Escape key
-        mockOnConfirm.mockReset();
-        mockOnCancel.mockReset();
-        showToast('Test message', mockOnConfirm, mockOnCancel);
-    
-        const eventEscape = new KeyboardEvent('keydown', { key: 'Escape' });
-        document.dispatchEvent(eventEscape);
-        expect(mockOnCancel).toHaveBeenCalled();
-        expect(document.getElementById('toast-container').style.display).toBe('none');
-    });
-
-    test('should handle an unhandled key press', () => {
-
-        const mockOnConfirm = jest.fn();
-        const mockOnCancel = jest.fn();
-        
-        showToast('Test message', mockOnConfirm, mockOnCancel);
-
-        const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
-        document.dispatchEvent(event);
-
-
-        expect(toastContainer.style.display).toBe('flex');
-        expect(mockOnConfirm).not.toHaveBeenCalled();
-        expect(mockOnCancel).not.toHaveBeenCalled();
-    });
-
-
     it('should keep the toast visible if no interaction occurs', () => {
         const mockOnConfirm = jest.fn();
         const mockOnCancel = jest.fn();
@@ -106,3 +66,5 @@ describe('showToast', () => {
     });
 
 });
+
+
