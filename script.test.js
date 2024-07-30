@@ -5,6 +5,8 @@ const { fireEvent } = require("@testing-library/dom");
 
 describe('HTML', () => {
 
+
+
 beforeEach(() => {
     
     const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
@@ -15,12 +17,31 @@ beforeEach(() => {
     const styleElement = document.createElement('style');
     styleElement.textContent = cssContent;
     document.head.appendChild(styleElement);
+
+    file = document.querySelector('*');
+    body = document.querySelector('body');
+    mainDiv = document.querySelector('.main');
+    noti = document.querySelector('p');
+    toastDiv = document.querySelector('#toast-container');
+    todoDiv = document.querySelector('.todo')
+    script = document.querySelector('script');
+    header = document.querySelector('header');
+    h1Element = header.querySelector('h1');
+    taskFieldDiv = document.querySelector('.taskfield');
+    taskInputDiv = document.querySelector('.taskinput');
+    form = taskInputDiv.querySelector('form');
+    inputField = form.querySelector('#input');
+    addBtn= form.querySelector('#add');
+    addBtnImg = addBtn.querySelector('img');
+    
+
+
 });
      
 describe('HTML-File Section', () => {
 
     it('should have font family as "Arial,sans-serif"', () => {
-        const file = document.querySelector('*');
+    
         const style = window.getComputedStyle(file);
 
         expect(file).toBeTruthy();
@@ -31,166 +52,62 @@ describe('HTML-File Section', () => {
 describe('HTML-Body Section', () => {
 
     it('should have a body tag', () => {
-        const body = document.querySelector('body');
         expect(body).toBeTruthy();
-    });
-    
-    it('should have a main div', () => {
-        const body = document.querySelector('body');
-        const mainDiv = document.querySelector('.main');
-
         expect(body.contains(mainDiv)).toBe(true);
-    });
-
-    it('should have a notification message', () => {
-        const body = document.querySelector('body');
-        const noti = document.querySelector('p');
-
         expect(body.contains(noti)).toBe(true);
-    });
-
-    it('should have a toast div', () => {
-        const body = document.querySelector('body');
-        const toastDiv = document.querySelector('#toast-container');
-
         expect(body.contains(toastDiv)).toBe(true);
-    });
-
-    it('should have a script tag', () => {
-        const body = document.querySelector('body');
-        const script = document.querySelector('script');
-
         expect(body.contains(script)).toBe(true);
-    });
-});
 
-describe('HTML-Main Section', () => {
-
-    it('should have a div with class name "main"', () => {
-        const mainDiv = document.querySelector('.main');
         const styles = window.getComputedStyle(mainDiv);
 
         expect(mainDiv).toBeTruthy();
         expect(styles.backgroundImage).toBe("url(../img/back2.jpg)");
     });
-});
+
+});    
+
 
 describe('HTML-ToDo Section', () => {
 
     it('should have a div with class name "todo"', () => {
-        const todoDiv = document.querySelector('.todo');
-        const styles = window.getComputedStyle(todoDiv);
+        
+        const stylesToDo = window.getComputedStyle(todoDiv);
 
         expect(todoDiv).toBeTruthy();
-        expect(styles.backgroundColor).toBe('rgba(212, 174, 236, 0.801)');      
-    });
-});
-
-describe('HTML-Header Section', () => {
-
-    it('should have a header', () => {
-        const header = document.querySelector('header');
-
         expect(header).toBeTruthy();
-    });
-
-    it('should have a h1 inside header', () => {
-        const header = document.querySelector('header');
-        const h1Element = header.querySelector('h1');
-
         expect(header.contains(h1Element)).toBe(true);
-    });
-
-    it('should have a header with text "To-Do Planner!"', () => {
-        const header = document.querySelector('header');
-        const h1Element = document.querySelector('header h1');
+        expect(stylesToDo.backgroundColor).toBe('rgba(212, 174, 236, 0.801)');
         const styles = window.getComputedStyle(header);
 
         expect(h1Element.textContent).toBe('To-Do Planner!');
         expect(styles.color).toBe('rgb(63, 20, 119)');
-    
+          
     });
 });
+
 
 describe('HTML-Task Input Section', () => {
 
     
     it('should have a div with class name "taskfield"', () => {
-        const taskFieldDiv = document.querySelector('.taskfield');
-        expect(taskFieldDiv).toBeTruthy();
-    });
-
-    it('should have a div with class name "taskinput"', () => {
-        const taskInputDiv = document.querySelector('.taskinput');
-        expect(taskInputDiv).toBeTruthy();
-    });
-
-    it('should have a form tag inside taskinput', () => {
-        const taskInputDiv = document.querySelector('.taskinput');
-        const form= taskInputDiv.querySelector('form');
-
-        expect(taskInputDiv.contains(form)).toBe(true);
-    });
-
-
-    it('should have a input and button tag inside form', () => {
-        const form= document.querySelector('form');
-        const inputField = form.querySelector('#input');
-        const addBtn= form.querySelector('#add');
-
-        expect(form.contains(inputField) && form.contains(addBtn)).toBe(true);
-    });
-
-    it('should have a input field with attributes "type:text, id:input" ', () => {
-        const inputField = document.querySelector('form input');
         
+        expect(taskFieldDiv).toBeTruthy();
+        expect(taskInputDiv).toBeTruthy();
+        expect(taskInputDiv.contains(form)).toBe(true);
+        expect(form.contains(inputField) && form.contains(addBtn)).toBe(true);
         expect(inputField.getAttribute('type')).toBe('text');
         expect(inputField.getAttribute('id')).toBe('input');
-        
-    });
-
-    it('should have a placeholder as "Enter your tasks..."', () => {
-        const inputField = document.querySelector('form input');
-    
         expect(inputField.getAttribute('placeholder')).toBe('Enter your tasks...');   
-    });
-
-    it('should have autocomplete off and maximum length 150 for input field', () => {
-        const inputField = document.querySelector('form input');
-
         expect(inputField.getAttribute('autocomplete')).toBe('off');  
-        expect( inputField.getAttribute('maxlength')).toBe('150'); 
-    });
-
-    it('should have a empty value "" in input field ', () => {
-        const inputField = document.querySelector('form input');
-
+        expect(inputField.getAttribute('maxlength')).toBe('150'); 
         expect(inputField.textContent).toBe('');
-        
-    });
-
-    it('should have a add button with attributes "type:submit, id:add, title:Add" ', () => {
-        const addBtn = document.querySelector('#add');
-        
         expect(addBtn.getAttribute('type')).toBe('submit');
         expect(addBtn.getAttribute('id')).toBe('add');
         expect(addBtn.getAttribute('title')).toBe('Add');
-    });
-
-    it('should have a image for add button', () => {
-        const addBtn= document.querySelector('#add');
-        const addBtnImg = addBtn.querySelector('img');
-        
-
         expect(addBtn.contains(addBtnImg)).toBe(true);
-    });
-
-    it('should have a add button image with attributes "source alt:add icon" ', () => {
-        
-        const addBtnImg= document.querySelector('#add img');
-
         expect(addBtnImg.getAttribute('src')).toBe('img/taskadd.png');
         expect(addBtnImg.getAttribute('alt')).toBe('add icon'); 
+
     });
 
 });
