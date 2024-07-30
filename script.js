@@ -10,7 +10,6 @@ const inputBox = document.querySelector('#input'), //? Task input field
 
 let taskIdCounter = parseInt(localStorage.getItem('taskIdCounter')) || 0; //? ID counter variable for tasks
 
-//* 3.Event listeners
 
 //* 3.1 Event listener for DOMContentLoaded to render tasks from local storage on page load based on filter
 document.addEventListener('DOMContentLoaded', () => { // Load existing tasks on page load
@@ -73,9 +72,6 @@ function renderTasks() {
     toggleTaskListVisibility(allTasks);
 }
 
-
-
-
 function renderEachTask(task) {
 
     const taskList = document.querySelector('#listtask');
@@ -85,17 +81,12 @@ function renderEachTask(task) {
 
 }
 
-
 function clearTaskList() {
 
     const taskList = document.querySelector('#listtask');
     taskList.innerHTML = '';
 
 }
-
-
-
-
 
 function addTask() {
 
@@ -138,8 +129,6 @@ function addTask() {
     inputBox.focus();
 }
 
-
-
 function validateInput(taskText, currentId = -1) {
 
     if (taskText === '') {
@@ -155,9 +144,6 @@ function validateInput(taskText, currentId = -1) {
     return true;
 
 }
-
-
-
 
 //* 6.Function to create a task element
 function createTaskElement(task) {
@@ -211,11 +197,6 @@ function createTaskElement(task) {
 
     return aTask;
 }
-
-
-
-
-//* 7.Function to display task counts text based on filter
 //* 7.Function to display task counts text based on filter
 function displayTaskCounts(tasks, filter) {
 
@@ -255,9 +236,6 @@ function displayTaskCounts(tasks, filter) {
 
 }
 
-
-
-//* 8.Function to filter tasks based on the selected filter
 //* 8.Function to filter tasks based on the selected filter
 function filterTasks(tasks, filter) {
 
@@ -271,7 +249,6 @@ function filterTasks(tasks, filter) {
     }
 
 }
-
 
 //* 9.Function to toggle visibility of task list and no tasks page
 function toggleTaskListVisibility(tasks) {
@@ -299,7 +276,6 @@ function toggleTaskListVisibility(tasks) {
 
 }
 
-
 //* 10.Function to change completed status when checkbox is clicked
 function checkBox(taskId) {
 
@@ -311,9 +287,7 @@ function checkBox(taskId) {
 
 }
 
-
 //* 11.Function to delete a task
-
 function deleteTask(taskId) {
     showToast('Are you sure you want to delete this task?', () => {
         let allTasks;
@@ -329,8 +303,6 @@ function deleteTask(taskId) {
         showNotification('Task deletion canceled', 'red');
     });
 }
-
-
 
 function toggleEdit(taskId) {
 
@@ -349,8 +321,6 @@ function toggleEdit(taskId) {
 
 }
 
-
-
 function toggleSave(taskId) {
 
     disableOtherElements(false);
@@ -361,7 +331,6 @@ function toggleSave(taskId) {
     taskText.setAttribute('readonly', 'true');
     taskText.style.borderStyle = 'none';
 }
-
 
 function disableOtherElements(disabled) {
 
@@ -390,8 +359,6 @@ function disableOtherElements(disabled) {
 
 }
 
-
-
 //* 14.Function to toggle between edit/delete and save/cancel
 function toggleTaskControls(taskId, from, to) {
 
@@ -406,7 +373,6 @@ function toggleTaskControls(taskId, from, to) {
 
 
 }
-
 
 //* 15.Function to save edited task
 function saveTask(taskId) {
@@ -443,11 +409,6 @@ function saveTask(taskId) {
     showToast('Are you sure you want to save changes to this task?', confirmSave, cancelSave);
 }
 
-
-
-
-
-
 //* 16.Function to cancel editing task
 function cancelEdit(taskId) {
 
@@ -460,7 +421,6 @@ function cancelEdit(taskId) {
     toggleSave(taskId); 
 
 }
-
 
 //* 17.Function to clear all tasks from screen and local storage based on filter
 function clearTasks() {
@@ -511,7 +471,6 @@ function clearTasks() {
     });
 }
 
-
 //* 18.Function to check if task is already present
 function isTaskAlreadyExists(taskText, currentId) { 
 
@@ -519,7 +478,6 @@ function isTaskAlreadyExists(taskText, currentId) {
     return allTasks.some(task => task.text.toLowerCase() === taskText.toLowerCase() && task.id !== currentId); //? Return true if exists
 
 }
-
 
 //* 19.Function to display notification
 function showNotification(text = 'Notification', color = 'blue') {
@@ -559,10 +517,6 @@ function toggleToast(visible) {
     const toastContainer = document.getElementById('toast-container');
     toastContainer.style.display = visible ? 'flex' : 'none'; // Toggle toast visibility
 }
-
-
-
-
 
 window.taskIdCounter = taskIdCounter;
 window.renderTasks = renderTasks;
