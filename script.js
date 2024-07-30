@@ -518,57 +518,33 @@ function toggleToast(visible) {
     toastContainer.style.display = visible ? 'flex' : 'none'; // Toggle toast visibility
 }
 
-window.taskIdCounter = taskIdCounter;
-window.renderTasks = renderTasks;
-window.renderEachTask = renderEachTask;
-window.addTask = addTask;
-window.checkBox = checkBox;
-window.clearTasks = clearTasks;
-window.cancelEdit = cancelEdit;
-window.isTaskAlreadyExists = isTaskAlreadyExists;
-window.filterTasks = filterTasks;
-window.deleteTask = deleteTask;
-window.saveTask = saveTask;
-window.toggleEdit = toggleEdit;
 
-window.toggleSave = toggleSave;
-window.showNotification = showNotification;
-window.showToast = showToast;
-window.clearTaskList = clearTaskList;
-window.createTaskElement = createTaskElement;
-window.displayTaskCounts = displayTaskCounts;
-window.toggleTaskListVisibility = toggleTaskListVisibility;
-window.disableOtherElements = disableOtherElements;
-window.toggleTaskControls = toggleTaskControls;
-window.cancelEdit = cancelEdit;
-window.validateInput = validateInput;
-window.toggleToast = toggleToast;
 
-// module.exports = {
-//     taskIdCounter,
-//     renderTasks,
-//     renderEachTask,
-//     addTask,
-//     validateInput,
-//     checkBox,
-//     clearTasks,
-//     cancelEdit,
-//     isTaskAlreadyExists,
-//     filterTasks,
-//     deleteTask,
-//     saveTask,
-//     toggleEdit,
-//     toggleSave,
-//     showNotification,
-//     showToast,
-//     clearTaskList,
-//     createTaskElement,
-//     displayTaskCounts,
-//     toggleTaskListVisibility,
-//     disableOtherElements,
-//     toggleTaskControls,
-//     toggleToast
-// };
+module.exports = {
+    taskIdCounter,
+    renderTasks,
+    renderEachTask,
+    addTask,
+    validateInput,
+    checkBox,
+    clearTasks,
+    cancelEdit,
+    isTaskAlreadyExists,
+    filterTasks,
+    deleteTask,
+    saveTask,
+    toggleEdit,
+    toggleSave,
+    showNotification,
+    showToast,
+    clearTaskList,
+    createTaskElement,
+    displayTaskCounts,
+    toggleTaskListVisibility,
+    disableOtherElements,
+    toggleTaskControls,
+    toggleToast
+};
 
 
 

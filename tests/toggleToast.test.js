@@ -7,7 +7,8 @@ beforeEach(() => {
     const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
     document.body.innerHTML = html;
 
-    require('../script.js');
+    ({toggleToast} = require('../script.js'));
+    
 });
 
 

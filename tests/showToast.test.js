@@ -9,7 +9,8 @@ describe('showToast', () => {
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
         document.body.innerHTML = html;
 
-        require('../script.js');
+        ({showToast} = require('../script.js'));
+        
 
         mockOnConfirm = jest.fn();
         mockOnCancel = jest.fn();

@@ -33,6 +33,9 @@ beforeEach(() => {
     })();
     Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
 
+    ({taskIdCounter} = require('../script.js'));
+
+
     jest.resetModules();
     localStorage.clear();
 

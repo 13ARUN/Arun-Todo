@@ -8,7 +8,6 @@ beforeEach(() => {
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
         
         document.body.innerHTML = html;
-        require('../script.js');
 
         const mockLocalStorage = (() => {
             let store = {};
@@ -21,6 +20,7 @@ beforeEach(() => {
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
+        ({clearTaskList} = require('../script.js'));
         
         localStorage.clear();
     });

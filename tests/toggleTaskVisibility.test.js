@@ -10,7 +10,6 @@ beforeEach(() => {
         
         document.body.innerHTML = html;
 
-        require('../script.js');
 
         const mockLocalStorage = (() => {
             let store = {};
@@ -22,6 +21,9 @@ beforeEach(() => {
             };
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
+
+        ({toggleTaskListVisibility} = require('../script.js'));
+
 
         localStorage.clear();
     });

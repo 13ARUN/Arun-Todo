@@ -485,7 +485,31 @@ beforeEach(() => {
     const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
     
     document.body.innerHTML = html;
-    require('./script.js');
+    ({
+        taskIdCounter,
+        renderTasks,
+        renderEachTask,
+        addTask,
+        validateInput,
+        checkBox,
+        clearTasks,
+        cancelEdit,
+        isTaskAlreadyExists,
+        filterTasks,
+        deleteTask,
+        saveTask,
+        toggleEdit,
+        toggleSave,
+        showNotification,
+        showToast,
+        clearTaskList,
+        createTaskElement,
+        displayTaskCounts,
+        toggleTaskListVisibility,
+        disableOtherElements,
+        toggleTaskControls,
+        toggleToast
+    } = require('./script.js'));
 
     const mockLocalStorage = (() => {
         let store = {};

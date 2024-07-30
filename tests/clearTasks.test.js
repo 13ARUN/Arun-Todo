@@ -10,7 +10,6 @@
             
             document.body.innerHTML = html;
 
-            require('../script.js');
             
             const mockLocalStorage = (() => {
                 let store = {};
@@ -23,7 +22,8 @@
             })();
             Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
             
-            
+            ({clearTasks} = require('../script.js'));
+
             localStorage.clear();
         });
         

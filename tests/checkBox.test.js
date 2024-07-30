@@ -8,7 +8,6 @@ beforeEach(() => {
         
         document.body.innerHTML = html;
 
-        require('../script.js');
 
         const mockLocalStorage = (() => {
             let store = {};
@@ -21,6 +20,7 @@ beforeEach(() => {
         })();
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
         
+        ({checkBox} = require('../script.js'));
        
         localStorage.clear();
     });

@@ -9,9 +9,12 @@ describe('showNotification', () => {
     beforeEach(() => {
         const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
         document.body.innerHTML = html;
-        require('../script.js');
+        
 
         notification = document.querySelector('.notification');
+
+        ({showNotification} = require('../script.js'));
+
 
         jest.useFakeTimers();
     });
