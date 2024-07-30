@@ -121,7 +121,7 @@ describe('SaveTask Function', () => {
         //expect(taskInput.value).toBe('');
 
         const notificationElement = document.querySelector('.notification');
-        expect(notificationElement.textContent).toBe('Task cannot be empty!!'); // Example error message
+        expect(notificationElement.textContent).toBe('Task cannot contain only spaces!'); // Example error message
     });
 
     test('should not allow saving a task with text that already exists', () => {

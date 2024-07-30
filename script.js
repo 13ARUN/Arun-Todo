@@ -383,7 +383,7 @@ function saveTask(taskId) {
 
 
     let taskText = document.querySelector(`#onetask-${taskId}`);
-    let editedText = taskText.value.trim().replace(/\s+/g, ' ');
+    let editedText = taskText.value;
 
     if (!validateInput(editedText, taskId)) {
         taskText.focus();

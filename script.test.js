@@ -1575,10 +1575,10 @@ afterEach(() => {
             const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
             expect(updatedTasks).toHaveLength(1);
             expect(updatedTasks[0].text).toBe('Old Task Text');
-            expect(taskInput.value).toBe(''); // Ensure UI reflects updated text
+            expect(taskInput.value).toBe(''); 
     
             const notificationElement = document.querySelector('.notification');
-            expect(notificationElement.textContent).toBe('Task cannot be empty!!'); // Example error message
+            expect(notificationElement.textContent).toBe('Task cannot be empty!!'); 
         });
     
         it('should not update task text when input empty and re-render tasks', () => {
@@ -1602,7 +1602,7 @@ afterEach(() => {
             //expect(taskInput.value).toBe('');
     
             const notificationElement = document.querySelector('.notification');
-            expect(notificationElement.textContent).toBe('Task cannot be empty!!'); // Example error message
+            expect(notificationElement.textContent).toBe('Task cannot contain only spaces!'); // Example error message
         });
     
         test('should not allow saving a task with text that already exists', () => {
