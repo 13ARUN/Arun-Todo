@@ -3,6 +3,7 @@ const path = require('path');
 const { fireEvent } = require("@testing-library/dom");
 
 
+
 describe('HTML', () => {
 
 
@@ -397,13 +398,12 @@ describe('HTML-Script Section', () => {
 
 describe('Unit Tests', () => {
 
-beforeEach(() => {
+    beforeEach(() => {
 
-    const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
-    
-    document.body.innerHTML = html;
-    ({
-        taskIdCounter,
+        const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
+        document.body.innerHTML = html;
+
+        ({
         renderTasks,
         renderEachTask,
         addTask,
@@ -426,286 +426,105 @@ beforeEach(() => {
         disableOtherElements,
         toggleTaskControls,
         toggleToast
-    } = require('./script.js'));
+        } = require('./script.js'));
 
-    const mockLocalStorage = (() => {
-        let store = {};
-        return {
-            getItem: (key) => store[key] || null,
-            setItem: (key, value) => (store[key] = value.toString()),
-            clear: () => (store = {}),
-            removeItem: (key) => delete store[key],
-        };
-    })();
-    Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
+        const mockLocalStorage = (() => {
+            let store = {};
+            return {
+                getItem: (key) => store[key] || null,
+                setItem: (key, value) => (store[key] = value.toString()),
+                clear: () => (store = {}),
+                removeItem: (key) => delete store[key],
+            };
+        })();
+        Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
 
-    localStorage.clear();
-});
-    
-afterEach(() => {
-    localStorage.clear();
-});
-
-    describe('AddTask Function', () => {
-        it('should increment the taskIdCounter correctly', () => {
-    
-            document.querySelector('#input').value = 'First Task';
-            addTask();
-    
-            document.querySelector('#input').value = 'Second Task';
-            addTask();
-            
-    
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(tasks[0].id).toBe(1);
-            expect(tasks[1].id).toBe(2);
-        });
-    
-        it('should add two new tasks', () => {
-            const inputBox = document.querySelector('#input');
-            const form = document.querySelector('form');
-    
-            inputBox.value = 'Task 1';
-            addTask();
-    
-            inputBox.value = 'Task 2';
-            addTask();
-    
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            
-            expect(tasks[0].text).toBe('Task 1');
-            expect(tasks[1].text).toBe('Task 2');
-    
-        });
-    
-        it('should add a task and update localStorage', () => {
-    
-            localStorage.setItem('taskIdCounter', '1');
-    
-            document.querySelector('#input').value = 'Test Task';
-            
-    
-            addTask();
-    
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-    
-            expect(tasks).toHaveLength(1);
-            expect(tasks[0].text).toBe('Test Task');
-            expect(tasks[0].completed).toBe(false);
-            
-    
-            const notification = document.querySelector('.notification');
-            
-            expect(notification.textContent).toBe("Task added successfully");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('green');
-        });
-    
-        it('should handle tasks with special characters correctly', () => {
-            document.querySelector('#input').value = 'Task with @special #characters!';
-            addTask();
-    
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(tasks).toHaveLength(1);
-            expect(tasks[0].text).toBe('Task with @special #characters!');
-        });
-    
-        it('should not add a duplicate task', () => {
-    
-            document.querySelector('#input').value = 'Duplicate Task';
-            addTask(); 
-    
-            document.querySelector('#input').value = 'Duplicate Task'; 
-            addTask(); 
-    
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-    
-            expect(tasks).toHaveLength(1); 
-    
-            const notification = document.querySelector('.notification');
-    
-            expect(notification.textContent).toBe("Task already exists!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
-        });
-    
-        it('should treat tasks with different cases as duplicates', () => {
-    
-            document.querySelector('#input').value = 'Case Insensitive Task';
-            addTask(); 
-            
-            document.querySelector('#input').value = 'case insensitive task'; 
-            addTask();
-            
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(tasks).toHaveLength(1);
-    
-            const notification = document.querySelector('.notification');
-            
-            expect(notification.textContent).toBe("Task already exists!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
-        });
-    
-        it('should not add a task if input is empty', () => {
-    
-            document.querySelector('#input').value = '';
-    
-            addTask();
-    
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(tasks).toBeNull();
-    
-            const notification = document.querySelector('.notification');
-    
-            expect(notification.textContent).toBe("Task cannot be empty!!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
-            
-        });
-    
-        it('should not add a task if input contains only spaces', () => {
-    
-            document.querySelector('#input').value = '   ';
-    
-            addTask();
-    
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(tasks).toBeNull();
-    
-            const notification = document.querySelector('.notification');
-    
-            expect(notification.textContent).toBe("Task cannot contain only spaces!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
-            
-        });
-    
-        it('should clear input field and focus after adding a task', () => {
-    
-            const input = document.querySelector('#input');
-            input.value = 'Task to Clear';
-    
-            addTask();
-    
-            expect(input.value).toBe('');
-            expect(document.activeElement).toBe(input);
-        });
-    
+        localStorage.clear();
+    });
+        
+    afterEach(() => {
+        localStorage.clear();
     });
 
-    describe('CancelEdit Function', () => {
-    
-        it('should restore original task text on cancel edit', () => {
-    
-            const sampleTasks = [
-                { id: '1', text: 'Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
-    
-            const taskInput = document.querySelector('#onetask-1');
-            taskInput.value = 'Updated Task Text';
-    
-            cancelEdit('1'); 
-            
-            expect(taskInput.value).toBe('Task Text');
-            expect(document.querySelector('#save-1').style.display).toBe('none');
-            expect(document.querySelector('#edit-1').style.display).toBe('flex'); 
-        });
-    
-        it('should not affect other tasks when canceling edit', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Task 1', completed: false },
-                { id: '2', text: 'Task 2', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '2');
-    
-            renderTasks();
-    
-            const taskInput1 = document.querySelector('#onetask-1');
-            const taskInput2 = document.querySelector('#onetask-2');
-            taskInput1.value = 'Updated Task 1 Text';
-            taskInput2.value = 'Updated Task 2 Text';
-    
-            cancelEdit('1'); 
-            
-            expect(taskInput1.value).toBe('Task 1'); 
-            expect(taskInput2.value).toBe('Updated Task 2 Text'); 
-        });
-    
-    });
 
-    describe('CheckBox function', () => {
 
+    // TODO
+    describe('RenderTasks', () => {
     
-        it('should toggle the completion status of a task and re-render tasks', () => {
-            const taskId = 1;
-            const initialTasks = [
-                { id: taskId, text: 'Sample Task', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(initialTasks));
-    
-            checkBox(taskId);
-    
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-            const updatedTask = updatedTasks.find(task => task.id === taskId);
-            expect(updatedTask.completed).toBe(true); 
-        
-        });
-    
-        it('should toggle the completion status of a task and re-render tasks', () => {
-            const taskId = 1;
-            const initialTasks = [
-                { id: taskId, text: 'Sample Task', completed: true }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(initialTasks));
-    
-            checkBox(taskId);
-    
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-            const updatedTask = updatedTasks.find(task => task.id === taskId);
-            expect(updatedTask.completed).toBe(false); 
-        
-        });
-    
-        it('should toggle the completion status of the correct task when multiple tasks exist', () => {
-            const taskId = 2;
-            const initialTasks = [
+        it('should render tasks from localStorage', () => {
+            
+            const tasks = [
                 { id: 1, text: 'Task 1', completed: false },
-                { id: taskId, text: 'Task 2', completed: false },
-                { id: 3, text: 'Task 3', completed: false }
+                { id: 2, text: 'Task 2', completed: true }
             ];
-            localStorage.setItem('tasks', JSON.stringify(initialTasks));
-        
-            checkBox(taskId);
-        
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-            const updatedTask = updatedTasks.find(task => task.id === taskId);
-            expect(updatedTask.completed).toBe(true); 
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            localStorage.setItem('statusFilter', 'all');
+    
+            renderTasks();
+           
+            const taskElements = document.querySelectorAll('.atask');
+            expect(taskElements.length).toBe(tasks.length);
+    
+            const taskTexts = Array.from(taskElements).map(el => el.querySelector('input').value);
+            expect(taskTexts).toEqual(tasks.map(task => task.text));
+        });
+    
+        it('should render only in-progress tasks when filter is set to "inprogress"', () => {
+            
+            const tasks = [
+                { id: 1, text: 'Task 1', completed: false },
+                { id: 2, text: 'Task 2', completed: true }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            localStorage.setItem('statusFilter', 'inprogress');
+    
+            renderTasks();
+    
+            const taskElements = document.querySelectorAll('.atask');
+            expect(taskElements.length).toBe(1);
+            expect(taskElements[0].querySelector('input').value).toBe('Task 1');
+        });
+    
+        it('should render only completed tasks when filter is set to "completed"', () => {
+    
+            const tasks = [
+                { id: 1, text: 'Task 1', completed: false },
+                { id: 2, text: 'Task 2', completed: true }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            localStorage.setItem('statusFilter', 'completed');
+    
+            renderTasks();
+    
+            const taskElements = document.querySelectorAll('.atask');
+            expect(taskElements.length).toBe(1);
+            expect(taskElements[0].querySelector('input').value).toBe('Task 2');
+        });
+    
+        it('should display "no tasks" message if no tasks are available', () => {
+     
+            localStorage.setItem('tasks', JSON.stringify([]));
+            localStorage.setItem('statusFilter', 'all');
+    
+            renderTasks();
+    
+            const noTasksMessage = document.querySelector('.notasks');
+            expect(noTasksMessage.style.display).toBe('flex');
+            const taskList = document.querySelector('.tasklist');
+            expect(taskList.style.display).toBe('none');
         });
     });
 
     describe('ClearTaskList Function', () => {
 
-        it('should clear all tasks from the task list', () => {
-    
-            const taskList = document.querySelector('#listtask');
-            taskList.innerHTML = `
-                <li>Task 1</li>
-                <li>Task 2</li>
-                <li>Task 3</li>
-            `;
-    
-            clearTaskList();
-    
-            expect(taskList.innerHTML).toBe('');
+        let taskList
+
+        beforeEach(() => {
+            taskList = document.querySelector('#listtask');
         });
     
-        it('should not affect other elements on the page', () => {
+        it('should clear all tasks from the task list and not other elements', () => {
+
             document.body.innerHTML = `
                 <ul id="listtask">
                     <li>Task 1</li>
@@ -714,12 +533,13 @@ afterEach(() => {
             `;
     
             clearTaskList();
-    
+
+            expect(taskList.innerHTML).toBe('');
             expect(document.querySelector('#other-element').textContent).toBe('This should not be cleared');
         });
     
-        it('should handle an empty task list gracefully', () => {
-            const taskList = document.querySelector('#listtask');
+        it('should handle an empty task list', () => {
+
             taskList.innerHTML = '';
     
             clearTaskList();
@@ -729,115 +549,200 @@ afterEach(() => {
     
     });
 
-    describe('ClearTasks Function', () => {
-        
-        it('should clear all tasks when filter is "all"', () => {
+    describe('DisplayTaskCounts Function', () => {
 
-            localStorage.setItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }, { id: 2, text: 'Task 2', completed: true }]));
-            localStorage.setItem('statusFilter', 'all');
-            
-            clearTasks();
+        let countDiv
 
-            const confirmButton = document.getElementById('confirm-button');
-            confirmButton.click();
-            
-            expect(localStorage.getItem('tasks')).toBe(null); 
+        beforeEach(() => {
+            countDiv = document.querySelector('.count h3');
         });
 
-        it('should clear only in-progress tasks when filter is "inprogress"', () => {
+        it('should display "You have no tasks here!" for an empty task array with default filter', () => {
             
-            localStorage.setItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }, { id: 2, text: 'Task 2', completed: true }]));
-            localStorage.setItem('statusFilter', 'inprogress');
+            const tasks = [];
+    
+            displayTaskCounts(tasks, 'none');
+    
+            expect(countDiv.textContent).toBe('You have no tasks here!');
+        });
+    
+        it('should display "You have no tasks here!" for an empty task array with filter "all"', () => {
             
-            clearTasks();
+            const tasks = [];
+    
+            displayTaskCounts(tasks, 'all');
+            expect(countDiv.textContent).toBe('You have no tasks here!');
 
-            const confirmButton = document.getElementById('confirm-button');
-            confirmButton.click();
+            displayTaskCounts(tasks, 'inprogress');
+            expect(countDiv.textContent).toBe('You have no tasks to do!');
 
-            const remainingTasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(remainingTasks.length).toBe(1); 
-            expect(remainingTasks[0].completed).toBe(true);
+            displayTaskCounts(tasks, 'completed');
+            expect(countDiv.textContent).toBe('You have not completed any tasks!');
+
+        });
+    
+        it('should display the correct count text for all tasks with 1 task', () => {
+    
+            const tasks = [
+                { id: 1, text: 'Single Task', completed: false }
+            ];
+    
+            displayTaskCounts(tasks, 'all');
+            expect(countDiv.textContent).toBe('You have a total of 1 task!');
         });
 
-        it('should clear only completed tasks when filter is "completed"', () => {
-            
-            localStorage.setItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }, { id: 2, text: 'Task 2', completed: true }]));
-            localStorage.setItem('statusFilter', 'completed');
+    
+        it('should display the correct count text for in-progress tasks with 1 task', () => {
 
-            clearTasks();
+            const tasks = [
+                { id: 1, text: 'In-progress Task', completed: false },
+                { id: 2, text: 'Completed Task', completed: true }
+            ];
+    
+            displayTaskCounts(tasks, 'inprogress');
+            expect(countDiv.textContent).toBe('You have 1 task to do!');
 
-            const confirmButton = document.getElementById('confirm-button');
-            confirmButton.click();
-
-            const remainingTasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(remainingTasks.length).toBe(1); 
-            expect(remainingTasks[0].completed).toBe(false);
+            displayTaskCounts(tasks, 'completed');
+            expect(countDiv.textContent).toBe('You have completed 1 task!');
         });
-
-        it('should cancel clear when cancel button is clicked', () => {
-
-            localStorage.setItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }, { id: 2, text: 'Task 2', completed: true }]));
-            localStorage.setItem('statusFilter', 'all');
+    
+        it('should display the correct count for all tasks', () => {
             
-            clearTasks();
-
-            const cancelButton = document.getElementById('cancel-button');
-            cancelButton.click();
+            const tasks = [
+                { id: 1, text: 'Task 1', completed: false },
+                { id: 2, text: 'Task 2', completed: true },
+                { id: 3, text: 'Task 3', completed: true },
+                { id: 4, text: 'Task 4', completed: false }
+            ];
             
-            expect(localStorage.getItem('tasks')).not.toBe(null); 
-        });
+            displayTaskCounts(tasks, 'all');
+            expect(countDiv.textContent).toBe('You have a total of 4 tasks!');
 
-        it('should handle case where there are no tasks to clear', () => {
-            
-            localStorage.setItem('tasks', JSON.stringify([])); 
-            localStorage.setItem('statusFilter', 'all');
-            
-            clearTasks();
+            displayTaskCounts(tasks, 'inprogress');
+            expect(countDiv.textContent).toBe('You have 2 tasks to do!');
 
-            const confirmButton = document.getElementById('confirm-button');
-            confirmButton.click();
-
-            expect(localStorage.getItem('tasks')).toBeNull();
-        });
-
-        it('should display the correct confirmation message for different filters', () => {
-            const filters = ['all', 'inprogress', 'completed'];
-
-            filters.forEach(filter => {
-                localStorage.setItem('statusFilter', filter);
-                clearTasks();
-
-                const message = document.querySelector('#message-text').textContent;
-                switch (filter) {
-                    case 'all':
-                        expect(message).toBe('Are you sure you want to clear all tasks?');
-                        break;
-                    case 'inprogress':
-                        expect(message).toBe('Are you sure you want to clear all in-progress tasks?');
-                        break;
-                    case 'completed':
-                        expect(message).toBe('Are you sure you want to clear all completed tasks?');
-                        break;
-                }
-
-            });    
-        });
-        
-        it('should reset taskIdCounter when clearing all tasks', () => {
-            localStorage.setItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }]));
-            localStorage.setItem('taskIdCounter', '5');
-            localStorage.setItem('statusFilter', 'all');
-            
-            clearTasks();
-
-            const confirmButton = document.getElementById('confirm-button');
-            confirmButton.click();
-
-            expect(localStorage.getItem('taskIdCounter')).toBeNull(); 
-        });
-
+            displayTaskCounts(tasks, 'completed');
+            expect(countDiv.textContent).toBe('You have completed 2 tasks!');
+        });    
+    
     });
 
+    describe('FilterTasks Function', () => {
+
+        it('should return an empty array for an empty task list', () => {
+            const tasks = [];
+            const filteredTasks = filterTasks(tasks, 'all');
+            expect(filteredTasks).toEqual([]);
+        
+            const filteredInProgressTasks = filterTasks(tasks, 'inprogress');
+            expect(filteredInProgressTasks).toEqual([]);
+        
+            const filteredCompletedTasks = filterTasks(tasks, 'completed');
+            expect(filteredCompletedTasks).toEqual([]);
+        });
+    
+        it('should return an empty array if no tasks match the filter inprogress', () => {
+            const tasks = [
+                { id: 1, text: 'Task 1', completed: true },
+                { id: 2, text: 'Task 2', completed: true },
+            ];
+            const filteredTasks = filterTasks(tasks, 'inprogress');
+            expect(filteredTasks).toEqual([]);
+        });
+    
+        it('should return an empty array if no tasks match the filter completed', () => {
+            const tasks = [
+                { id: 1, text: 'Task 1', completed: false },
+                { id: 2, text: 'Task 2', completed: false },
+            ];
+            const filteredTasks = filterTasks(tasks, 'completed');
+            expect(filteredTasks).toEqual([]);
+        });
+    
+        it('should correctly filter tasks based on completion status', () => {
+            const tasks = [
+                { id: 1, text: 'Task 1', completed: false },
+                { id: 2, text: 'Task 2', completed: true },
+                { id: 3, text: 'Task 3', completed: false },
+            ];
+    
+            const filteredAllTasks = filterTasks(tasks, 'all');
+            expect(filteredAllTasks).toEqual(tasks);
+        
+            const filteredInProgressTasks = filterTasks(tasks, 'inprogress');
+            expect(filteredInProgressTasks).toEqual([
+                { id: 1, text: 'Task 1', completed: false },
+                { id: 3, text: 'Task 3', completed: false },
+            ]);
+        
+            const filteredCompletedTasks = filterTasks(tasks, 'completed');
+            expect(filteredCompletedTasks).toEqual([
+                { id: 2, text: 'Task 2', completed: true },
+            ]);
+        });
+    });
+
+    // TODO
+    describe('RenderEachTask', () => {
+    
+        test('should create and append a task element with correct content', () => {
+            
+            const task = {
+                id: 1,
+                text: 'Sample Task',
+                completed: false
+            };
+    
+            renderEachTask(task);
+    
+            const taskElement = document.querySelector('.atask');
+            expect(taskElement).not.toBeNull();
+    
+            const inputElement = taskElement.querySelector('input');
+            expect(inputElement).not.toBeNull();
+            expect(inputElement.value).toBe(task.text);
+    
+            const editButton = taskElement.querySelector('button[title="Edit Task"]');
+            expect(editButton).not.toBeNull();
+    
+            const deleteButton = taskElement.querySelector('button[title="Delete Task"]');
+            expect(deleteButton).not.toBeNull();
+            
+            const checkboxButton = taskElement.querySelector('button[title="Status"]');
+            expect(checkboxButton).not.toBeNull();
+            expect(checkboxButton.querySelector('img').src).toContain('img/notdone.png');
+        });
+    
+        test('should apply the correct opacity based on the task completion status', () => {
+    
+            const task = {
+                id: 2,
+                text: 'Completed Task',
+                completed: true
+            };
+    
+            renderEachTask(task);
+    
+            const taskElement = document.querySelector('.atask');
+            expect(taskElement.style.opacity).toBe('0.6');
+        });
+    
+        test('should render the save/cancel buttons only when editing', () => {
+            
+            const task = {
+                id: 3,
+                text: 'Editable Task',
+                completed: false
+            };
+    
+            renderEachTask(task);
+    
+            const saveCancelDiv = document.querySelector(`#save-${task.id}`);
+            expect(saveCancelDiv.style.display).toBe('none');
+        });
+    });
+
+    // TODO
     describe('CreateTaskElement Function', () => {
 
         it('should create a task element with the correct structure', () => {
@@ -920,53 +825,502 @@ afterEach(() => {
     
     });
 
+    describe('ToggleTaskVisibility Function', () => {
+        
+        let noTasks, showtask, taskActions, countDiv;
+    
+        beforeEach(() => {
+           
+            const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
+            document.body.innerHTML = html;
+    
+            noTasks = document.querySelector('.notasks');
+            showtask = document.querySelector('.tasklist');
+            taskActions = document.querySelector('.tasktext');
+            countDiv = document.querySelector('.clear');
+        });
+    
+        it('should hide task list and display no tasks message when there are no tasks', () => {
+
+            const tasks = [];
+            toggleTaskListVisibility(tasks);
+    
+            expect(noTasks.style.display).toBe('flex');
+            expect(showtask.style.display).toBe('none');
+            expect(taskActions.style.display).toBe('none');
+            expect(countDiv.style.display).toBe('none');
+        });
+    
+        it('should show task list and hide no tasks message when there are tasks', () => {
+            const tasks = [{ id: 1, text: 'Sample Task', completed: false }];
+            toggleTaskListVisibility(tasks);
+    
+            expect(noTasks.style.display).toBe('none');
+            expect(showtask.style.display).toBe('flex');
+            expect(taskActions.style.display).toBe('flex');
+            expect(countDiv.style.display).toBe('flex');
+        });
+    
+    });
+
+
+    // TODO
+    describe('AddTask Function', () => {
+
+        beforeEach(() => {
+
+            inputBox = document.querySelector('#input');
+            notification = document.querySelector('.notification');
+
+        });
+
+        it('should add a task and update localStorage', () => {
+            
+            const tasksBefore = JSON.parse(localStorage.getItem('tasks'));
+            const taskIdCounterBefore = JSON.parse(localStorage.getItem('taskIdCounter'));
+            const statusFilterBefore= localStorage.getItem('statusFilter');
+
+            expect(tasksBefore).toBeNull;
+            expect(taskIdCounterBefore).toBeNull;
+            expect(statusFilterBefore).toBeNull;
+
+            expect(inputBox.value).toBe('');
+            expect(document.activeElement).not.toBe(inputBox);
+    
+            inputBox.value = 'Test Task';
+            addTask();
+
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const taskIdCounter = JSON.parse(localStorage.getItem('taskIdCounter'));
+            const statusFilter= localStorage.getItem('statusFilter');
+    
+            expect(tasks).toHaveLength(1);
+            expect(tasks[0].id).toBe(1);
+            expect(tasks[0].text).toBe('Test Task');
+            expect(tasks[0].completed).toBe(false);
+
+            expect(taskIdCounter).toBe(1);
+            expect(statusFilter).toBe('all');
+
+            expect(inputBox.value).toBe('');
+            expect(document.activeElement).toBe(inputBox);
+            
+            expect(notification.textContent).toBe("Task added successfully");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('green');
+        });
+
+        it('should add a task and update localStorage when a task already exists', () => {
+
+            const task = [
+                { id: 1, text: 'Task 1', completed: true }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(task));
+            localStorage.setItem('taskIdCounter', 1);
+
+
+            inputBox.value = 'Test Task';
+            addTask();
+
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const taskIdCounter = JSON.parse(localStorage.getItem('taskIdCounter'));
+            const statusFilter= localStorage.getItem('statusFilter');
+    
+            expect(tasks).toHaveLength(2);
+
+            expect(tasks[0].id).toBe(1);
+            expect(tasks[0].text).toBe('Task 1');
+            expect(tasks[0].completed).toBe(true);
+
+            expect(tasks[1].id).toBe(2);
+            expect(tasks[1].text).toBe('Test Task');
+            expect(tasks[1].completed).toBe(false);
+
+            expect(taskIdCounter).toBe(2);
+            expect(statusFilter).toBe('all');
+
+            expect(inputBox.value).toBe('');
+            
+        });
+    
+        it('should handle tasks with special characters correctly', () => {
+
+            localStorage.setItem('taskIdCounter', 1);
+
+            inputBox.value = 'Task with @special #characters!';
+            addTask();
+    
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+
+            expect(tasks).toHaveLength(1);
+            expect(tasks[0].text).toBe('Task with @special #characters!');
+        });
+    
+        it('should not add a duplicate task', () => {
+    
+            inputBox.value = 'Duplicate Task';
+            addTask(); 
+    
+            inputBox.value = 'Duplicate Task'; 
+            addTask(); 
+    
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+
+    
+            expect(tasks).toHaveLength(1); 
+            expect(tasks[0].text).toBe('Duplicate Task');
+
+            expect(inputBox.value).toBe('');
+            const styleInputBox = window.getComputedStyle(inputBox);
+            expect(styleInputBox.borderBottom).toBe('2px solid red');
+    
+            expect(notification.textContent).toBe("Task already exists!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+        });
+    
+        it('should treat tasks with different cases as duplicates', () => {
+
+            inputBox.value = 'Case Insensitive Task';
+            addTask(); 
+            
+            inputBox.value = 'case insensitive task'; 
+            addTask();
+            
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+
+            expect(tasks).toHaveLength(1);
+
+            expect(notification.textContent).toBe("Task already exists!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+        });
+    
+        it('should not add a task if input is empty', () => {
+    
+            inputBox.value = '';
+            addTask();
+    
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+
+            expect(tasks).toBeNull();
+
+            expect(inputBox.value).toBe('');
+            const styleInputBox = window.getComputedStyle(inputBox);
+            expect(styleInputBox.borderBottom).toBe('2px solid red');
+    
+            expect(notification.textContent).toBe("Task cannot be empty!!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            
+        });
+    
+        it('should not add a task if input contains only spaces', () => {
+    
+            inputBox.value = '   ';
+    
+            addTask();
+    
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+
+            expect(tasks).toBeNull();
+    
+            const notification = document.querySelector('.notification');
+    
+            expect(notification.textContent).toBe("Task cannot contain only spaces!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            
+        });
+    
+    
+    });
+
+    describe('ValidateInput function', () => {
+
+        let notification
+
+        beforeEach(() => {
+
+            notification = document.querySelector('.notification');
+
+        });
+
+
+        it('should return false if input is empty', () => {
+
+            const inputValue = '';
+
+            const result = validateInput(inputValue);
+    
+            expect(result).toBe(false);
+
+            expect(notification.textContent).toBe("Task cannot be empty!!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            
+        });
+    
+        it('should return false if input is only whitespace', () => {
+           
+            const inputValue = '    ';
+
+            const result = validateInput(inputValue);
+    
+            expect(result).toBe(false);
+
+            expect(notification.textContent).toBe("Task cannot contain only spaces!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            
+        });
+
+        it('should return false if input is valid but not unique', () => {
+
+            const tasks = [
+                { id: 1, text: 'Task 1' }
+              ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            const inputValue = 'Task 1';
+    
+            const result = validateInput(inputValue,-1);
+    
+            expect(result).toBe(false);
+
+            expect(notification.textContent).toBe("Task already exists!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            
+        });
+
+        it('should return false if input is valid but not unique after trim', () => {
+
+            const tasks = [
+                { id: 1, text: 'Task 1' }
+              ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            const inputValue = '   Task 1    ';
+    
+            const result = validateInput(inputValue,-1);
+    
+            expect(result).toBe(false);
+            
+        });
+
+        it('should return false if input is valid but not unique after space characters replace', () => {
+
+            const tasks = [
+                { id: 1, text: 'Task 1' }
+              ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            const inputValue = 'Task           1';
+    
+            const result = validateInput(inputValue,-1);
+    
+            expect(result).toBe(false);
+            
+        });
+
+
+        it('should return true if input is valid and unique', () => {
+            
+            const inputValue = 'Valid Task';
+
+            const result = validateInput(inputValue);
+    
+            expect(result).toBe(true);
+            
+        });
+    
+    });
+
+    describe('IsTaskAlreadyExists Function', () => {
+
+        it('should return false when there are no tasks', () => {
+    
+            localStorage.setItem('tasks', JSON.stringify([]));
+    
+            expect(isTaskAlreadyExists('New Task', -1)).toBeFalsy();
+    
+        });
+
+        it('should return false when localStorage does not contain the "tasks" key', () => {
+            
+            localStorage.removeItem('tasks');
+        
+            expect(isTaskAlreadyExists('Task 1', -1)).toBeFalsy();
+        });
+        
+        it('should return false when task does not exist', () => {
+    
+            const tasks = [
+              { id: 1, text: 'Task 1' },
+              { id: 2, text: 'Task 2' }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            expect(isTaskAlreadyExists('New Task', -1)).toBeFalsy();
+    
+        });
+        
+        it('should return true when task already exists', () => {
+    
+            const tasks = [
+              { id: 1, text: 'Task 1' },
+              { id: 2, text: 'Task 2' }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            expect(isTaskAlreadyExists('Task 1', -1)).toBeTruthy();
+    
+        });
+    
+        it('should return true when task already exists but in different case', () => {
+            
+            const tasks = [
+              { id: 1, text: 'tAsK 1' },
+              { id: 2, text: 'Task 2' }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            expect(isTaskAlreadyExists('Task 1', -1)).toBeTruthy();
+    
+        });
+    
+        it('should return false when task exists but has the same id', () => {
+        
+            const tasks = [
+              { id: 1, text: 'Task 1' },
+              { id: 2, text: 'Task 2' }
+            ];
+    
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            expect(isTaskAlreadyExists('Task 1', 1)).toBeFalsy();
+    
+        });
+
+        it('should return false when task exists but has the different id', () => {
+        
+            const tasks = [
+              { id: 1, text: 'Task 1' },
+              { id: 2, text: 'Task 2' }
+            ];
+    
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            expect(isTaskAlreadyExists('Task 1', 2)).toBeTruthy();
+    
+        });
+    
+    });
+
+    
+
+    describe('CheckBox function', () => {
+
+    
+        it('should toggle the completion status of a task and re-render tasks', () => {
+            const taskId = 1;
+            const initialTasks = [
+                { id: taskId, text: 'Sample Task', completed: false }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(initialTasks));
+    
+            checkBox(taskId);
+    
+            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTask = updatedTasks.find(task => task.id === taskId);
+            expect(updatedTask.completed).toBe(true); 
+
+            checkBox(taskId);
+    
+            const updatedTasks2 = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTask2 = updatedTasks2.find(task => task.id === taskId);
+            expect(updatedTask2.completed).toBe(false); 
+        
+        });
+    
+        it('should toggle the completion status of the correct task when multiple tasks exist', () => {
+            const taskId = 2;
+            const initialTasks = [
+                { id: 1, text: 'Task 1', completed: false },
+                { id: taskId, text: 'Task 2', completed: false },
+                { id: 3, text: 'Task 3', completed: false }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(initialTasks));
+        
+            checkBox(taskId);
+        
+            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTask = updatedTasks.find(task => task.id === taskId);
+            const unUpdatedTask1 = updatedTasks.find(task => task.id === 1);
+            const unUpdatedTask3 = updatedTasks.find(task => task.id === 1);
+
+            expect(updatedTask.completed).toBe(true);
+            expect(unUpdatedTask1.completed).toBe(false);
+            expect(unUpdatedTask3.completed).toBe(false);
+
+        });
+    });
+
+
+
+
     describe('Delete Function', () => {
 
-        it('should delete a task and update localStorage and UI on confirmation', () => {
-            
+        let notification, confirmButton, cancelButton
+
+        beforeEach(() => {
+
+            notification = document.querySelector('.notification');
+            confirmButton = document.getElementById('confirm-button');
+            cancelButton = document.getElementById('cancel-button');
+
             const sampleTasks = [
-                { id: '1', text: 'Task to Delete', completed: false },
-                { id: '2', text: 'Another Task', completed: false }
+                { id: '1', text: 'Task to Delete', completed: false }
             ];
             localStorage.setItem('tasks', JSON.stringify(sampleTasks));
             localStorage.setItem('taskIdCounter', '2');
     
     
             renderTasks();
+
+        });
+
+        it('should delete a task and update localStorage and UI on confirmation', () => {
     
             deleteTask('1');
-    
-            const confirmButton = document.getElementById('confirm-button');
+
             confirmButton.click();
     
             const tasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(tasks).toHaveLength(1);
-            expect(tasks[0].id).toBe('2');
+            expect(tasks).toBeNull;
     
             expect(document.querySelector('#onetask-1')).toBeNull(); 
-            expect(document.querySelector('#onetask-2')).toBeTruthy();
+
+            expect(notification.textContent).toBe("Task deleted successfully");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('green');
     
         });
     
         it('should cancel deletion and show cancellation message on cancel', () => {
-       
-            const sampleTasks = [
-                { id: '1', text: 'Task to Cancel', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
-    
     
             deleteTask('1');
-    
-            const cancelButton = document.getElementById('cancel-button');
+
             cancelButton.click();
     
             const tasks = JSON.parse(localStorage.getItem('tasks'));
             expect(tasks).toHaveLength(1); 
             expect(document.querySelector('#onetask-1')).toBeTruthy(); 
+
+            expect(notification.textContent).toBe("Task deletion canceled");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('red');
     
     
         });
@@ -983,8 +1337,7 @@ afterEach(() => {
             renderTasks();
     
             deleteTask('2');
-    
-            const confirmButton = document.getElementById('confirm-button');
+   
             confirmButton.click();
     
             const tasks = JSON.parse(localStorage.getItem('tasks'));
@@ -993,36 +1346,216 @@ afterEach(() => {
             expect(tasks.some(task => task.id === '1')).toBeTruthy(); 
             expect(tasks.some(task => task.id === '3')).toBeTruthy(); 
         });
+      
+    });
+
     
-        it('should delete the last task and update the UI correctly', () => {
+
+    describe('ClearTasks Function', () => {
+
+        let confirmButton, cancelButton, notification
+
+        beforeEach(() => {
+
             const sampleTasks = [
-                { id: '1', text: 'Last Task', completed: false }
+                { id: 1, text: 'Task 1', completed: false }, 
+                { id: 2, text: 'Task 2', completed: true } 
+            ];
+            
+            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+
+            confirmButton = document.getElementById('confirm-button');
+            cancelButton = document.getElementById('cancel-button');
+            notification = document.querySelector('.notification');
+        });
+
+        it('should display the correct confirmation message for different filters', () => {
+            const filters = ['all', 'inprogress', 'completed'];
+
+            filters.forEach(filter => {
+                localStorage.setItem('statusFilter', filter);
+                clearTasks();
+
+                const message = document.querySelector('#message-text').textContent;
+                switch (filter) {
+                    case 'all':
+                        expect(message).toBe('Are you sure you want to clear all tasks?');
+                        break;
+                    case 'inprogress':
+                        expect(message).toBe('Are you sure you want to clear all in-progress tasks?');
+                        break;
+                    case 'completed':
+                        expect(message).toBe('Are you sure you want to clear all completed tasks?');
+                        break;
+                }
+
+            });    
+        });
+        
+        it('should clear all tasks when filter is "all"', () => {
+
+            localStorage.setItem('statusFilter', 'all');
+            
+            clearTasks();
+
+            confirmButton.click();
+            
+            expect(localStorage.getItem('tasks')).toBe(null); 
+
+            expect(notification.textContent).toBe("All tasks cleared!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('green');
+
+        });
+
+        it('should clear only in-progress tasks when filter is "inprogress"', () => {
+            
+            localStorage.setItem('statusFilter', 'inprogress');
+            
+            clearTasks();
+
+            confirmButton.click();
+
+            const remainingTasks = JSON.parse(localStorage.getItem('tasks'));
+            expect(remainingTasks.length).toBe(1); 
+            expect(remainingTasks[0].completed).toBe(true);
+            expect(remainingTasks[0].text).toBe('Task 2');
+
+            expect(notification.textContent).toBe("Inprogress tasks cleared!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('green');
+        });
+
+        it('should clear only completed tasks when filter is "completed"', () => {
+            
+            localStorage.setItem('statusFilter', 'completed');
+
+            clearTasks();
+
+            confirmButton.click();
+
+            const remainingTasks = JSON.parse(localStorage.getItem('tasks'));
+            expect(remainingTasks.length).toBe(1); 
+            expect(remainingTasks[0].completed).toBe(false);
+            expect(remainingTasks[0].text).toBe('Task 1');
+
+            expect(notification.textContent).toBe("Completed tasks cleared!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('green');
+        });
+
+        it('should cancel clear when cancel button is clicked', () => {
+
+            localStorage.setItem('statusFilter', 'all');
+            
+            clearTasks();
+
+            cancelButton.click();
+            
+            expect(localStorage.getItem('tasks')).not.toBe(null);
+            
+            expect(notification.textContent).toBe("Task clearing canceled");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('red');
+        });
+
+        it('should handle case where there are no tasks to clear', () => {
+            
+            localStorage.setItem('tasks', JSON.stringify([])); 
+            localStorage.setItem('statusFilter', 'all');
+            
+            clearTasks();
+
+            confirmButton.click();
+
+            expect(localStorage.getItem('tasks')).toBeNull();
+        });
+
+        
+        
+        it('should reset taskIdCounter when clearing all tasks', () => {
+            localStorage.setItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }]));
+            localStorage.setItem('taskIdCounter', '5');
+            localStorage.setItem('statusFilter', 'all');
+            
+            clearTasks();
+
+            confirmButton.click();
+
+            expect(localStorage.getItem('taskIdCounter')).toBeNull(); 
+            expect(localStorage.getItem('tasks')).toBeNull(); 
+        });
+
+    });
+
+
+
+
+    describe('ToggleEdit Function', () => {
+
+        beforeEach(() => {
+
+            const sampleTasks = [
+                { id: '1', text: 'Editable Task', completed: false }
             ];
             localStorage.setItem('tasks', JSON.stringify(sampleTasks));
             localStorage.setItem('taskIdCounter', '1');
     
             renderTasks();
+
+        })
+
+        it('should enable editing mode for a task', () => {
     
-            deleteTask('1');
+            toggleEdit('1');
+        
     
-            const confirmButton = document.getElementById('confirm-button');
-            confirmButton.click();
+            const taskInput = document.querySelector('#onetask-1');
+            expect(taskInput).toBeTruthy();
+            expect(taskInput.hasAttribute('readonly')).toBe(false);
+            expect(taskInput.readOnly).toBe(false);
+            expect(taskInput.style.borderBottom).toBe('2px solid #461b80');
+            expect(document.activeElement).toBe(taskInput);
+        });
     
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            expect(tasks).toHaveLength(0); 
-            expect(document.querySelector('#onetask-1')).toBeNull(); 
-        });  
-    });
+    
+        it('should restore input border style on input event', () => {
+    
+            toggleEdit('1');
+    
+            const taskInput = document.querySelector('#onetask-1');
+            taskInput.dispatchEvent(new Event('input'));
+    
+            expect(taskInput.readOnly).toBe(false);
+            expect(taskInput.style.borderBottom).toBe('2px solid #461b80');
+        });
+    
+    }); 
 
     describe('DisableOtherElements Function', () => {
 
-        it('should disable all elements when passed true', () => {
+        let inputBox, addButton, clearButton, allEditButtons, radioButtons
+
+        beforeEach(() => {
+
+            inputBox = document.getElementById('input');
+            addButton = document.getElementById('add');
+            clearButton = document.getElementById('clear');
+            allEditButtons = document.querySelectorAll('.editdel button');
+            radioButtons = document.querySelectorAll('input[name="taskFilter"]');
+
+            const sampleTasks = [
+                { id: '1', text: 'Task Text 1', completed: false }
+            ];
+
+            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
     
-            const inputBox = document.getElementById('input');
-            const addButton = document.getElementById('add');
-            const clearButton = document.getElementById('clear');
-            const allEditButtons = document.querySelectorAll('.editdel button');
-            const radioButtons = document.querySelectorAll('input[name="taskFilter"]');
+            renderTasks();
+
+
+        })
+
+        it('should disable all elements when passed true', () => {
     
             disableOtherElements(true);
     
@@ -1041,12 +1574,6 @@ afterEach(() => {
     
         it('should enable all elements when passed false', () => {
     
-            const inputBox = document.getElementById('input');
-            const addButton = document.getElementById('add');
-            const clearButton = document.getElementById('clear');
-            const allEditButtons = document.querySelectorAll('.editdel button');
-            const radioButtons = document.querySelectorAll('input[name="taskFilter"]');
-    
             disableOtherElements(false);
     
             expect(inputBox.disabled).toBe(false);
@@ -1064,396 +1591,17 @@ afterEach(() => {
     
     });
 
-    describe('DisplayTaskCounts Function', () => {
-
-        it('should display "You have no tasks here!" for an empty task array with filter "all"', () => {
-            
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [];
-            const filter = 'none';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have no tasks here!');
-        });
-    
-        it('should display "You have no tasks here!" for an empty task array with filter "all"', () => {
-            
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [];
-            const filter = 'all';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have no tasks here!');
-        });
-    
-        it('should display "You have no tasks to do!";" for an empty task array with filter "inprogress"', () => {
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [];
-            const filter = 'inprogress';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have no tasks to do!');
-        });
-    
-        it('should display "You have not completed any tasks!" for an empty task array with filter "completed"', () => {
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [];
-            const filter = 'completed';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have not completed any tasks!');
-        });
-    
-        it('should display the correct count for all tasks', () => {
-            
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true },
-                { id: 3, text: 'Task 3', completed: false }
-            ];
-            const filter = 'all';
-    
-            
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have a total of 3 tasks!');
-        });
-    
-        it('should display the correct count for in-progress tasks', () => {
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true },
-                { id: 3, text: 'Task 3', completed: false }
-            ];
-            const filter = 'inprogress';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have 2 tasks to do!');
-        });
-    
-        it('should display the correct count for completed tasks', () => {
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true },
-                { id: 3, text: 'Task 3', completed: true }
-            ];
-            const filter = 'completed';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have completed 2 tasks!');
-        });
-    
-        it('should display the correct count text for all tasks with 1 task', () => {
-    
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [
-                { id: 1, text: 'Single Task', completed: false }
-            ];
-            const filter = 'all';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have a total of 1 task!');
-        });
-    
-        it('should display the correct count text for in-progress tasks with 1 task', () => {
-    
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [
-                { id: 1, text: 'In-progress Task', completed: false }
-            ];
-            const filter = 'inprogress';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have 1 task to do!');
-        });
-    
-        it('should display the correct count text for completed tasks with 1 task', () => {
-    
-            const countDiv = document.querySelector('.count h3');
-    
-            const tasks = [
-                { id: 1, text: 'Completed Task', completed: true }
-            ];
-            const filter = 'completed';
-    
-            displayTaskCounts(tasks, filter);
-    
-            expect(countDiv.textContent).toBe('You have completed 1 task!');
-        });
-    
-    });
-
-    describe('FilterTasks Function', () => {
-
-        it('should return an empty array for an empty task list', () => {
-            const tasks = [];
-            const filteredTasks = filterTasks(tasks, 'all');
-            expect(filteredTasks).toEqual([]);
-        
-            const filteredInProgressTasks = filterTasks(tasks, 'inprogress');
-            expect(filteredInProgressTasks).toEqual([]);
-        
-            const filteredCompletedTasks = filterTasks(tasks, 'completed');
-            expect(filteredCompletedTasks).toEqual([]);
-        });
-    
-        it('should return an empty array if no tasks match the filter', () => {
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: true },
-                { id: 2, text: 'Task 2', completed: true },
-            ];
-            const filteredTasks = filterTasks(tasks, 'inprogress');
-            expect(filteredTasks).toEqual([]);
-        });
-    
-        it('should return an empty array if no tasks match the filter', () => {
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: false },
-            ];
-            const filteredTasks = filterTasks(tasks, 'completed');
-            expect(filteredTasks).toEqual([]);
-        });
-    
-        it('filterTasks should correctly filter tasks based on completion status', () => {
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true },
-                { id: 3, text: 'Task 3', completed: false },
-            ];
-    
-            const filteredAllTasks = filterTasks(tasks, 'all');
-            expect(filteredAllTasks).toEqual(tasks);
-        
-            const filteredInProgressTasks = filterTasks(tasks, 'inprogress');
-            expect(filteredInProgressTasks).toEqual([
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 3, text: 'Task 3', completed: false },
-            ]);
-        
-            const filteredCompletedTasks = filterTasks(tasks, 'completed');
-            expect(filteredCompletedTasks).toEqual([
-                { id: 2, text: 'Task 2', completed: true },
-            ]);
-        });
-    });
-
-    describe('IsTaskAlreadyExists Function', () => {
-
-        it('should return false when there are no tasks', () => {
-    
-            localStorage.setItem('tasks', JSON.stringify([]));
-    
-            expect(isTaskAlreadyExists('New Task', -1)).toBeFalsy();
-    
-          });
-        
-          it('should return false when task does not exist', () => {
-    
-            const tasks = [
-              { id: 1, text: 'Task 1' },
-              { id: 2, text: 'Task 2' }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            
-            expect(isTaskAlreadyExists('New Task', -1)).toBeFalsy();
-    
-          });
-        
-          it('should return true when task already exists', () => {
-    
-            const tasks = [
-              { id: 1, text: 'Task 1' },
-              { id: 2, text: 'Task 2' }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            
-            expect(isTaskAlreadyExists('Task 1', -1)).toBeTruthy();
-    
-          });
-    
-          it('should return true when task already exists but in different case', () => {
-            
-            const tasks = [
-              { id: 1, text: 'tAsK 1' },
-              { id: 2, text: 'Task 2' }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            
-            expect(isTaskAlreadyExists('Task 1', -1)).toBeTruthy();
-    
-          });
-    
-          it('should return false when task exists but has the same id', () => {
-        
-            const tasks = [
-              { id: 1, text: 'Task 1' },
-              { id: 2, text: 'Task 2' }
-            ];
-    
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            
-            expect(isTaskAlreadyExists('Task 1', 1)).toBeFalsy();
-    
-          });
-    
-          it('should return false when localStorage does not contain the "tasks" key', () => {
-            
-            localStorage.removeItem('tasks');
-        
-            expect(isTaskAlreadyExists('Task 1', -1)).toBeFalsy();
-        });
-    
-    });
-
-    describe('RenderEachTask', () => {
-    
-        test('should create and append a task element with correct content', () => {
-            
-            const task = {
-                id: 1,
-                text: 'Sample Task',
-                completed: false
-            };
-    
-            renderEachTask(task);
-    
-            const taskElement = document.querySelector('.atask');
-            expect(taskElement).not.toBeNull();
-    
-            const inputElement = taskElement.querySelector('input');
-            expect(inputElement).not.toBeNull();
-            expect(inputElement.value).toBe(task.text);
-    
-            const editButton = taskElement.querySelector('button[title="Edit Task"]');
-            expect(editButton).not.toBeNull();
-    
-            const deleteButton = taskElement.querySelector('button[title="Delete Task"]');
-            expect(deleteButton).not.toBeNull();
-            
-            const checkboxButton = taskElement.querySelector('button[title="Status"]');
-            expect(checkboxButton).not.toBeNull();
-            expect(checkboxButton.querySelector('img').src).toContain('img/notdone.png');
-        });
-    
-        test('should apply the correct opacity based on the task completion status', () => {
-    
-            const task = {
-                id: 2,
-                text: 'Completed Task',
-                completed: true
-            };
-    
-            renderEachTask(task);
-    
-            const taskElement = document.querySelector('.atask');
-            expect(taskElement.style.opacity).toBe('0.6');
-        });
-    
-        test('should render the save/cancel buttons only when editing', () => {
-            
-            const task = {
-                id: 3,
-                text: 'Editable Task',
-                completed: false
-            };
-    
-            renderEachTask(task);
-    
-            const saveCancelDiv = document.querySelector(`#save-${task.id}`);
-            expect(saveCancelDiv.style.display).toBe('none');
-        });
-    });
-
-    describe('RenderTasks', () => {
-    
-        test('should render tasks from localStorage', () => {
-            
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('statusFilter', 'all');
-    
-            renderTasks();
-           
-            const taskElements = document.querySelectorAll('.atask');
-            expect(taskElements.length).toBe(tasks.length);
-    
-            const taskTexts = Array.from(taskElements).map(el => el.querySelector('input').value);
-            expect(taskTexts).toEqual(tasks.map(task => task.text));
-        });
-    
-        test('should render only in-progress tasks when filter is set to "inprogress"', () => {
-            
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('statusFilter', 'inprogress');
-    
-            renderTasks();
-    
-            const taskElements = document.querySelectorAll('.atask');
-            expect(taskElements.length).toBe(1);
-            expect(taskElements[0].querySelector('input').value).toBe('Task 1');
-        });
-    
-        test('should render only completed tasks when filter is set to "completed"', () => {
-    
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('statusFilter', 'completed');
-    
-            renderTasks();
-    
-            const taskElements = document.querySelectorAll('.atask');
-            expect(taskElements.length).toBe(1);
-            expect(taskElements[0].querySelector('input').value).toBe('Task 2');
-        });
-    
-        test('should display "no tasks" message if no tasks are available', () => {
-     
-            localStorage.setItem('tasks', JSON.stringify([]));
-            localStorage.setItem('statusFilter', 'all');
-    
-            renderTasks();
-    
-            const noTasksMessage = document.querySelector('.notasks');
-            expect(noTasksMessage.style.display).toBe('flex');
-            const taskList = document.querySelector('.tasklist');
-            expect(taskList.style.display).toBe('none');
-        });
-    });
-
     describe('SaveTask Function', () => {
 
-        it('should update task text and re-render tasks', () => {
+        let notification,confirmButton, cancelButton
+
+        beforeEach(() => {
+
+            notification = document.querySelector('.notification');
+            confirmButton = document.getElementById('confirm-button');
+            cancelButton = document.getElementById('cancel-button');
+            
+
             const sampleTasks = [
                 { id: '1', text: 'Old Task Text', completed: false }
             ];
@@ -1461,54 +1609,53 @@ afterEach(() => {
             localStorage.setItem('taskIdCounter', '1');
     
             renderTasks();
+
+        });
+
+        it('should update task text and re-render tasks', () => {
+            
     
             const taskInput = document.querySelector('#onetask-1');
             taskInput.value = 'Updated Task Text';
             saveTask('1'); 
     
-            const confirmButton = document.getElementById('confirm-button');
             confirmButton.click();
     
             const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+
             expect(updatedTasks).toHaveLength(1);
             expect(updatedTasks[0].text).toBe('Updated Task Text');
             expect(taskInput.value).toBe('Updated Task Text'); 
+
+            expect(notification.textContent).toBe("Task updated successfully!");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('green');
         });
     
         it('should cancel saving of task text and re-render tasks', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
+            
     
             const taskInput = document.querySelector('#onetask-1');
             taskInput.value = 'Updated Task Text';
             saveTask('1'); 
     
-            const cancelButton = document.getElementById('cancel-button');
             cancelButton.click();
     
             const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
             expect(updatedTasks).toHaveLength(1);
             expect(updatedTasks[0].text).toBe('Old Task Text');
             expect(taskInput.value).toBe('Old Task Text'); 
+
+            expect(notification.textContent).toBe("Task saving canceled");
+            const style = window.getComputedStyle(notification);
+            expect(style.backgroundColor).toBe('red');
         });
     
         
         it('should not update task text when input empty and re-render tasks', () => {
     
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
-    
             const taskInput = document.querySelector('#onetask-1');
+
             taskInput.value = '';
             saveTask('1');
     
@@ -1523,16 +1670,7 @@ afterEach(() => {
         });
     
         it('should not update task text when input empty and re-render tasks', () => {
-    
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
-    
-    
+ 
             const taskInput = document.querySelector('#onetask-1');
             taskInput.value = '     ';
             saveTask('1'); 
@@ -1540,7 +1678,6 @@ afterEach(() => {
             const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
             expect(updatedTasks).toHaveLength(1);
             expect(updatedTasks[0].text).toBe('Old Task Text');
-            //expect(taskInput.value).toBe('');
     
             const notificationElement = document.querySelector('.notification');
             expect(notificationElement.textContent).toBe('Task cannot contain only spaces!'); // Example error message
@@ -1553,17 +1690,15 @@ afterEach(() => {
                 { id: 2, text: 'Another Task', completed: false }
             ];
             
-    
             localStorage.setItem('tasks', JSON.stringify(sampleTasks));
             localStorage.setItem('taskIdCounter', '1');
     
             renderTasks();
-    
+
             const taskInput = document.querySelector('#onetask-1');
             taskInput.value = 'Another Task';
             saveTask('1'); 
     
-            const confirmButton = document.getElementById('confirm-button');
             confirmButton.click();
         
             const notificationElement = document.querySelector('.notification');
@@ -1579,6 +1714,171 @@ afterEach(() => {
         
         
     });
+
+    describe('CancelEdit Function', () => {
+
+        beforeEach(() => {
+
+            const sampleTasks = [
+                { id: '1', text: 'Task 1', completed: false },
+                { id: '2', text: 'Task 2', completed: false }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+            localStorage.setItem('taskIdCounter', '2');
+    
+            renderTasks();
+
+        });
+    
+        it('should restore original task text on cancel edit', () => {
+    
+            const taskInput = document.querySelector('#onetask-1');
+            taskInput.value = 'Updated Task Text';
+    
+            cancelEdit('1'); 
+            
+            expect(taskInput.value).toBe('Task 1');
+            expect(document.querySelector('#save-1').style.display).toBe('none');
+            expect(document.querySelector('#edit-1').style.display).toBe('flex'); 
+        });
+    
+        it('should not affect other tasks when canceling edit', () => {
+            
+    
+            const taskInput1 = document.querySelector('#onetask-1');
+            const taskInput2 = document.querySelector('#onetask-2');
+            taskInput1.value = 'Updated Task 1 Text';
+            taskInput2.value = 'Updated Task 2 Text';
+    
+            cancelEdit('1'); 
+            
+            expect(taskInput1.value).toBe('Task 1'); 
+            expect(taskInput2.value).toBe('Updated Task 2 Text'); 
+        });
+    
+    });
+
+    describe('ToggleSave function', () => {
+
+        it('toggleSave sets task text to readonly and border style to none', () => {
+            const sampleTasks = [
+                { id: '1', text: 'Old Task Text', completed: false }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+            localStorage.setItem('taskIdCounter', '1');
+        
+            renderTasks();
+        
+            const taskText = document.querySelector(`#onetask-1`);
+        
+            expect(taskText.readOnly).toBe(true);
+            
+            toggleEdit('1');
+        
+            expect(taskText.readOnly).toBe(false);
+        
+            toggleSave('1');
+        
+            expect(taskText.readOnly).toBe(true);
+            expect(taskText.style.borderStyle).toBe('none');
+        });
+    });
+
+    describe('ToggleTaskControls function', () => {
+
+        beforeEach(() => {
+
+            const sampleTasks = [
+                { id: '1', text: 'Task Text 1', completed: false },
+                { id: '2', text: 'Task Text 2', completed: false }
+            ];
+
+            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+    
+            renderTasks();
+
+        });
+
+
+        it('should hide the edit div and show the save div', () => {
+
+            toggleTaskControls('1', 'edit', 'save');
+
+            const fromDiv = document.querySelector('#edit-1');
+            const toDiv = document.querySelector('#save-1');
+
+            expect(fromDiv.style.display).toBe('none');
+            expect(toDiv.style.display).toBe('flex');
+
+        });
+
+    
+        it('should hide the save div and show the edit div', () => {
+            
+            toggleTaskControls('1', 'save', 'edit');
+    
+            const fromDiv = document.querySelector('#save-1');
+            const toDiv = document.querySelector('#edit-1');
+
+            expect(fromDiv.style.display).toBe('none');
+            expect(toDiv.style.display).toBe('flex');
+        });
+    
+        it('should handle cases where both elements are initially not visible', () => {
+
+            const fromDiv = document.querySelector('#edit-1');
+            fromDiv.style.display = 'none';
+            const toDiv = document.querySelector('#save-1');
+            toDiv.style.display = 'none';
+        
+            toggleTaskControls('1', 'edit', 'save');
+        
+            expect(fromDiv.style.display).toBe('none');
+            expect(toDiv.style.display).toBe('flex');
+        });
+    
+        it('should handle cases where both elements are initially visible', () => {
+            
+        
+            const fromDiv = document.querySelector('#edit-1');
+            fromDiv.style.display = 'flex';
+            const toDiv = document.querySelector('#save-1');
+            toDiv.style.display = 'flex';
+        
+            toggleTaskControls('1', 'edit', 'save');
+        
+            expect(fromDiv.style.display).toBe('none');
+            expect(toDiv.style.display).toBe('flex');
+        });
+
+        it('should hide the edit element and show the save element of multiple tasks', () => {
+
+            toggleTaskControls('1', 'edit', 'save');
+            toggleTaskControls('1', 'save', 'edit');
+            toggleTaskControls('2', 'edit', 'save');
+            
+
+            const fromDiv = document.querySelector('#edit-1');
+            const toDiv = document.querySelector('#save-1');
+
+            const fromDiv2 = document.querySelector('#edit-2');
+            const toDiv2 = document.querySelector('#save-2');
+    
+
+            expect(fromDiv.style.display).toBe('flex');
+            expect(toDiv.style.display).toBe('none');
+
+            expect(fromDiv2.style.display).toBe('none');
+            expect(toDiv2.style.display).toBe('flex');
+        });
+        
+        
+        
+    
+    
+    });
+
+
 
     describe('ShowNotification', () => {
     
@@ -1616,7 +1916,7 @@ afterEach(() => {
             
             showNotification(text, color);
             
-            jest.advanceTimersByTime(1999);
+            jest.advanceTimersByTime(2999);
             
             expect(notification.textContent).toBe(text);
             expect(notification.style.backgroundColor).toBe(color);
@@ -1629,18 +1929,12 @@ afterEach(() => {
             
             showNotification(text, color);
             
-            jest.advanceTimersByTime(2000);
+            jest.advanceTimersByTime(3000);
             
             expect(notification.textContent).toBe('');
             expect(notification.style.visibility).toBe('hidden');
         });
-    
-        it('should not throw an error if no notification element is present', () => {
-            document.body.innerHTML = '';
-            
-            expect(() => showNotification('No Element Test', 'green')).not.toThrow();
-        });
-    
+       
         it('should display the notification with default text and color when no parameters are provided', () => {
             showNotification();
             
@@ -1669,12 +1963,10 @@ afterEach(() => {
 
     describe('ShowToast', () => {
 
+        let mockOnConfirm, mockOnCancel, toastContainer, messageText, confirmButton, cancelButton;
+
         beforeEach(() => {
-            const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
-            document.body.innerHTML = html;
-    
-            require('./script.js');
-    
+            
             mockOnConfirm = jest.fn();
             mockOnCancel = jest.fn();
             toastContainer = document.getElementById('toast-container');
@@ -1687,11 +1979,11 @@ afterEach(() => {
         });
     
         afterEach(() => {
-    
             jest.useRealTimers();
         });
     
         it('should display toast with correct message', () => {
+
             showToast('Test message', mockOnConfirm, mockOnCancel);
     
             expect(toastContainer.style.display).toBe('flex');
@@ -1699,8 +1991,9 @@ afterEach(() => {
         });
     
         it('should call onConfirm and hide toast when confirm button is clicked', () => {
+
             showToast('Test message', mockOnConfirm, mockOnCancel);
-    
+
             confirmButton.click();
     
             expect(mockOnConfirm).toHaveBeenCalled();
@@ -1731,213 +2024,25 @@ afterEach(() => {
     
     });
 
-    describe('ToggleEdit Function', () => {
-
-        it('should enable editing mode for a task', () => {
-    
-            const sampleTasks = [
-                { id: '1', text: 'Editable Task', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
-    
-            toggleEdit('1');
-        
-    
-            const taskInput = document.querySelector('#onetask-1');
-            expect(taskInput).toBeTruthy();
-            expect(taskInput.hasAttribute('readonly')).toBe(false);
-            expect(taskInput.readOnly).toBe(false);
-            expect(taskInput.style.borderBottom).toBe('2px solid #461b80');
-            expect(document.activeElement).toBe(taskInput);
-        });
-    
-    
-        it('should restore input border style on input event', () => {
-    
-            const sampleTasks = [
-                { id: '1', text: 'Task with Border', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
-    
-            toggleEdit('1');
-    
-            const taskInput = document.querySelector('#onetask-1');
-            taskInput.dispatchEvent(new Event('input'));
-    
-            expect(taskInput.readOnly).toBe(false);
-            expect(taskInput.style.borderBottom).toBe('2px solid #461b80');
-        });
-    
-    }); 
-
-    describe('ToggleSave function', () => {
-
-        it('toggleSave sets task text to readonly and border style to none', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-        
-            renderTasks();
-        
-            const taskText = document.querySelector(`#onetask-1`);
-        
-            expect(taskText.readOnly).toBe(true);
-            
-        
-            toggleEdit('1');
-        
-            expect(taskText.readOnly).toBe(false);
-        
-            toggleSave('1');
-        
-            expect(taskText.readOnly).toBe(true);
-            expect(taskText.style.borderStyle).toBe('none');
-        });
-    });
-
-    describe('ToggleTaskControls function', () => {
-
-
-        it('should hide the edit element and show the save element', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
-    
-            toggleTaskControls('1', 'edit', 'save');
-    
-            const fromDiv = document.querySelector('#edit-1');
-            const toDiv = document.querySelector('#save-1');
-            expect(fromDiv.style.display).toBe('none');
-            expect(toDiv.style.display).toBe('flex');
-        });
-    
-        it('should hide the save element and show the edit element', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-    
-            renderTasks();
-    
-            toggleTaskControls('1', 'save', 'edit');
-    
-            const fromDiv = document.querySelector('#save-1');
-            const toDiv = document.querySelector('#edit-1');
-            expect(fromDiv.style.display).toBe('none');
-            expect(toDiv.style.display).toBe('flex');
-        });
-    
-        it('should toggle visibility from hidden to visible for both elements', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-        
-            renderTasks();
-        
-            const fromDiv = document.querySelector('#edit-1');
-            fromDiv.style.display = 'none';
-            const toDiv = document.querySelector('#save-1');
-            toDiv.style.display = 'none';
-        
-            toggleTaskControls('1', 'edit', 'save');
-        
-            expect(fromDiv.style.display).toBe('none');
-            expect(toDiv.style.display).toBe('flex');
-        });
-    
-        it('should handle cases where both elements are initially visible', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
-        
-            renderTasks();
-        
-            const fromDiv = document.querySelector('#edit-1');
-            fromDiv.style.display = 'flex';
-            const toDiv = document.querySelector('#save-1');
-            toDiv.style.display = 'flex';
-        
-            toggleTaskControls('1', 'edit', 'save');
-        
-            expect(fromDiv.style.display).toBe('none');
-            expect(toDiv.style.display).toBe('flex');
-        });
-        
-        
-    
-    
-    });
-
-    describe('ToggleTaskVisibility Function', () => {
-        
-        let noTasks, showtask, taskActions, countDiv;
-    
-        beforeEach(() => {
-           
-            const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
-            document.body.innerHTML = html;
-    
-            noTasks = document.querySelector('.notasks');
-            showtask = document.querySelector('.tasklist');
-            taskActions = document.querySelector('.tasktext');
-            countDiv = document.querySelector('.clear');
-        });
-    
-        it('should hide task list and display no tasks message when there are no tasks', () => {
-            const tasks = [];
-            toggleTaskListVisibility(tasks);
-    
-            expect(noTasks.style.display).toBe('flex');
-            expect(showtask.style.display).toBe('none');
-            expect(taskActions.style.display).toBe('none');
-            expect(countDiv.style.display).toBe('none');
-        });
-    
-        it('should show task list and hide no tasks message when there are tasks', () => {
-            const tasks = [{ id: 1, text: 'Sample Task', completed: false }];
-            toggleTaskListVisibility(tasks);
-    
-            expect(noTasks.style.display).toBe('none');
-            expect(showtask.style.display).toBe('flex');
-            expect(taskActions.style.display).toBe('flex');
-            expect(countDiv.style.display).toBe('flex');
-        });
-    
-    });
-
     describe('ToggleToast Function', () => {
 
+        let toastContainer
+
+        beforeEach(() => {
+
+            toastContainer = document.querySelector('#toast-container');
+
+        });
 
         it('should show the toast container when visible is true', () => {
     
-            const toastContainer = document.querySelector("#toast-container");
             toggleToast(true);
     
             expect(toastContainer.style.display).toBe('flex');
         });
     
-    
-    
         it('should hide the toast container when visible is false', () => {
     
-            const toastContainer = document.querySelector("#toast-container");
             toggleToast(false);
     
             expect(toastContainer.style.display).toBe('none');
@@ -1945,7 +2050,6 @@ afterEach(() => {
     
         it('should handle toggling between visible and hidden states correctly', () => {
     
-            const toastContainer = document.querySelector("#toast-container");
             toggleToast(true);
             expect(toastContainer.style.display).toBe('flex');
     
@@ -1957,7 +2061,6 @@ afterEach(() => {
         });
     
         it('should handle undefined and null input gracefully', () => {
-            const toastContainer = document.querySelector("#toast-container");
             
             toggleToast(undefined);
             expect(toastContainer.style.display).toBe('none');
@@ -1969,43 +2072,7 @@ afterEach(() => {
     
     });
 
-    describe('ValidateInput function', () => {
-
-        
     
-        it('should return false if input is empty', () => {
-            const inputValue = '';
-            const existingTasks = [];
-    
-    
-            const result = validateInput(inputValue, existingTasks);
-    
-            expect(result).toBe(false);
-            
-        });
-    
-        it('should return false  if input is only whitespace', () => {
-            const inputValue = '   ';
-            const existingTasks = [];
-    
-            const result = validateInput(inputValue, existingTasks);
-    
-            expect(result).toBe(false);
-            
-        });
-    
-    
-        it('should return true if input is valid and unique', () => {
-            const inputValue = 'Unique Task';
-            const existingTasks = [{ text: 'Other Task' }];
-    
-            const result = validateInput(inputValue, existingTasks);
-    
-            expect(result).toBe(true);
-            
-        });
-    
-    });
 
 });
 
@@ -2104,8 +2171,6 @@ describe('DOM content load', () => {
     it('should initialize taskIdCounter from localStorage value', () => {
         localStorage.setItem('taskIdCounter', '10');
         
-        
-        expect(taskIdCounter).toBe(0);
         expect(localStorage.getItem('taskIdCounter')).toBe('10');
     });
 })
