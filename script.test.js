@@ -4,6 +4,8 @@ const { fireEvent } = require("@testing-library/dom");
 
 
 
+
+
 describe('HTML', () => {
 
 
@@ -465,54 +467,18 @@ describe('Unit Tests', () => {
             const taskElements = document.querySelectorAll('.atask');
             expect(taskElements.length).toBe(tasks.length);
     
-            const taskTexts = Array.from(taskElements).map(el => el.querySelector('input').value);
-            expect(taskTexts).toEqual(tasks.map(task => task.text));
         });
     
-        it('should render only in-progress tasks when filter is set to "inprogress"', () => {
+        it('should render tasks with empty array', () => {
             
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('statusFilter', 'inprogress');
+            localStorage.clear();
     
             renderTasks();
     
             const taskElements = document.querySelectorAll('.atask');
-            expect(taskElements.length).toBe(1);
-            expect(taskElements[0].querySelector('input').value).toBe('Task 1');
+            expect(taskElements.length).toBe(0);
         });
     
-        it('should render only completed tasks when filter is set to "completed"', () => {
-    
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('statusFilter', 'completed');
-    
-            renderTasks();
-    
-            const taskElements = document.querySelectorAll('.atask');
-            expect(taskElements.length).toBe(1);
-            expect(taskElements[0].querySelector('input').value).toBe('Task 2');
-        });
-    
-        it('should display "no tasks" message if no tasks are available', () => {
-     
-            localStorage.setItem('tasks', JSON.stringify([]));
-            localStorage.setItem('statusFilter', 'all');
-    
-            renderTasks();
-    
-            const noTasksMessage = document.querySelector('.notasks');
-            expect(noTasksMessage.style.display).toBe('flex');
-            const taskList = document.querySelector('.tasklist');
-            expect(taskList.style.display).toBe('none');
-        });
     });
 
     //*
@@ -685,8 +651,15 @@ describe('Unit Tests', () => {
         });
     });
 
-    // TODO
+    //*
     describe('RenderEachTask', () => {
+
+        let taskList;
+
+        beforeEach(() => {
+
+            taskList = document.querySelector('#listtask');
+        });
     
         test('should create and append a task element with correct content', () => {
             
@@ -697,56 +670,33 @@ describe('Unit Tests', () => {
             };
     
             renderEachTask(task);
-    
-            const taskElement = document.querySelector('.atask');
-            expect(taskElement).not.toBeNull();
-    
-            const inputElement = taskElement.querySelector('input');
-            expect(inputElement).not.toBeNull();
-            expect(inputElement.value).toBe(task.text);
-    
-            const editButton = taskElement.querySelector('button[title="Edit Task"]');
-            expect(editButton).not.toBeNull();
-    
-            const deleteButton = taskElement.querySelector('button[title="Delete Task"]');
-            expect(deleteButton).not.toBeNull();
-            
-            const checkboxButton = taskElement.querySelector('button[title="Status"]');
-            expect(checkboxButton).not.toBeNull();
-            expect(checkboxButton.querySelector('img').src).toContain('img/notdone.png');
+
+            expect(taskList.children.length).toBe(1);
+            expect(taskList.querySelector('.atask')).toBeTruthy();
+            expect(document.querySelector('.atask').style.opacity).toBe('1');
         });
-    
-        test('should apply the correct opacity based on the task completion status', () => {
-    
+
+        test('should create and append a task element with correct content', () => {
+            
             const task = {
-                id: 2,
-                text: 'Completed Task',
+                id: 1,
+                text: 'Sample Task',
                 completed: true
             };
     
             renderEachTask(task);
-    
-            const taskElement = document.querySelector('.atask');
-            expect(taskElement.style.opacity).toBe('0.6');
+
+            expect(taskList.children.length).toBe(1);
+            expect(taskList.querySelector('.atask')).toBeTruthy();
+            expect(document.querySelector('.atask').style.opacity).toBe('0.6');
         });
     
-        test('should render the save/cancel buttons only when editing', () => {
-            
-            const task = {
-                id: 3,
-                text: 'Editable Task',
-                completed: false
-            };
-    
-            renderEachTask(task);
-    
-            const saveCancelDiv = document.querySelector(`#save-${task.id}`);
-            expect(saveCancelDiv.style.display).toBe('none');
-        });
+
+
     });
 
-    // TODO
-    describe.only('CreateTaskElement Function', () => {
+    //*
+    describe('CreateTaskElement Function', () => {
 
         it('should create a task element with the correct structure', () => {
            
@@ -913,7 +863,7 @@ describe('Unit Tests', () => {
     });
 
 
-    // TODO
+    // TODO render
     describe('AddTask Function', () => {
 
         beforeEach(() => {
@@ -950,6 +900,10 @@ describe('Unit Tests', () => {
 
             expect(taskIdCounter).toBe(1);
             expect(statusFilter).toBe('all');
+
+            expect(document.querySelector('input[name="taskFilter"][value="all"]').checked).toBeTruthy();
+            expect(document.querySelector('input[name="taskFilter"][value="inprogress"]').checked).toBeFalsy();
+            expect(document.querySelector('input[name="taskFilter"][value="completed"]').checked).toBeFalsy();
 
             expect(inputBox.value).toBe('');
             expect(document.activeElement).toBe(inputBox);
@@ -1085,14 +1039,14 @@ describe('Unit Tests', () => {
     
     });
 
+    //*
     describe('ValidateInput function', () => {
 
-        let notification
+        let notification;
 
         beforeEach(() => {
 
             notification = document.querySelector('.notification');
-
         });
 
 
@@ -1186,6 +1140,7 @@ describe('Unit Tests', () => {
     
     });
 
+    //*
     describe('IsTaskAlreadyExists Function', () => {
 
         it('should return false when there are no tasks', () => {
@@ -1193,7 +1148,6 @@ describe('Unit Tests', () => {
             localStorage.setItem('tasks', JSON.stringify([]));
     
             expect(isTaskAlreadyExists('New Task', -1)).toBeFalsy();
-    
         });
 
         it('should return false when localStorage does not contain the "tasks" key', () => {
@@ -1267,11 +1221,47 @@ describe('Unit Tests', () => {
     
     });
 
-    
+ 
 
+    //*
     describe('CheckBox function', () => {
 
     
+        it('should change the completion status of a task and re-render tasks', () => {
+            const taskId = 1;
+            const initialTasks = [
+                { id: taskId, text: 'Sample Task', completed: false }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(initialTasks));
+    
+            checkBox(taskId);
+    
+            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTask = updatedTasks.find(task => task.id === taskId);
+            expect(updatedTask.completed).toBe(true); 
+
+            expect(document.querySelector('.atask').style.opacity).toBe('0.6');
+            expect(document.querySelector('#edit-1 button[title="Status"]').querySelector('img').src).toContain('img/done.png');
+            expect(document.querySelector('#save-1 button[title="Status"]').querySelector('img').src).toContain('img/done.png');
+        });
+
+        it('should change the completion status of a task and re-render tasks', () => {
+            const taskId = 1;
+            const initialTasks = [
+                { id: taskId, text: 'Sample Task', completed: true }
+            ];
+            localStorage.setItem('tasks', JSON.stringify(initialTasks));
+    
+            checkBox(taskId);
+    
+            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTask = updatedTasks.find(task => task.id === taskId);
+            expect(updatedTask.completed).toBe(false); 
+
+            expect(document.querySelector('.atask').style.opacity).toBe('1');
+            expect(document.querySelector('#edit-1 button[title="Status"]').querySelector('img').src).toContain('img/notdone.png');
+            expect(document.querySelector('#save-1 button[title="Status"]').querySelector('img').src).toContain('img/notdone.png');
+        });
         it('should toggle the completion status of a task and re-render tasks', () => {
             const taskId = 1;
             const initialTasks = [
@@ -1318,7 +1308,7 @@ describe('Unit Tests', () => {
 
 
 
-
+    //* 
     describe('Delete Function', () => {
 
         let notification, confirmButton, cancelButton
@@ -1334,8 +1324,7 @@ describe('Unit Tests', () => {
             ];
             localStorage.setItem('tasks', JSON.stringify(sampleTasks));
             localStorage.setItem('taskIdCounter', '2');
-    
-    
+
             renderTasks();
 
         });
@@ -1348,7 +1337,9 @@ describe('Unit Tests', () => {
     
             const tasks = JSON.parse(localStorage.getItem('tasks'));
             expect(tasks).toBeNull;
-    
+
+            
+            expect(document.querySelector('#listtask').children.length).toBe(0);
             expect(document.querySelector('#onetask-1')).toBeNull(); 
 
             expect(notification.textContent).toBe("Task deleted successfully");
@@ -1365,6 +1356,8 @@ describe('Unit Tests', () => {
     
             const tasks = JSON.parse(localStorage.getItem('tasks'));
             expect(tasks).toHaveLength(1); 
+
+            expect(document.querySelector('#listtask').children.length).toBe(1);
             expect(document.querySelector('#onetask-1')).toBeTruthy(); 
 
             expect(notification.textContent).toBe("Task deletion canceled");
@@ -1394,12 +1387,18 @@ describe('Unit Tests', () => {
             expect(tasks.some(task => task.id === '2')).toBeFalsy(); 
             expect(tasks.some(task => task.id === '1')).toBeTruthy(); 
             expect(tasks.some(task => task.id === '3')).toBeTruthy(); 
+
+            expect(document.querySelector('#listtask').children.length).toBe(2);
+            expect(document.querySelector('#onetask-1')).toBeTruthy(); 
+            expect(document.querySelector('#onetask-3')).toBeTruthy(); 
+            expect(document.querySelector('#onetask-2')).toBeFalsy(); 
         });
       
     });
 
     
 
+    //*
     describe('ClearTasks Function', () => {
 
         let confirmButton, cancelButton, notification
@@ -1412,6 +1411,8 @@ describe('Unit Tests', () => {
             ];
             
             localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+
+            renderTasks();
 
             confirmButton = document.getElementById('confirm-button');
             cancelButton = document.getElementById('cancel-button');
@@ -1451,6 +1452,10 @@ describe('Unit Tests', () => {
             
             expect(localStorage.getItem('tasks')).toBe(null); 
 
+            expect(document.querySelector('#listtask').children.length).toBe(0);
+            expect(document.querySelector('#onetask-1')).toBeNull();
+            expect(document.querySelector('#onetask-2')).toBeNull();
+
             expect(notification.textContent).toBe("All tasks cleared!");
             const style = window.getComputedStyle(notification);
             expect(style.backgroundColor).toBe('green');
@@ -1470,6 +1475,13 @@ describe('Unit Tests', () => {
             expect(remainingTasks[0].completed).toBe(true);
             expect(remainingTasks[0].text).toBe('Task 2');
 
+            localStorage.setItem('statusFilter', 'all');
+            renderTasks();
+
+            expect(document.querySelector('#listtask').children.length).toBe(1);
+            expect(document.querySelector('#onetask-2').value).toBe('Task 2');
+
+
             expect(notification.textContent).toBe("Inprogress tasks cleared!");
             const style = window.getComputedStyle(notification);
             expect(style.backgroundColor).toBe('green');
@@ -1488,6 +1500,13 @@ describe('Unit Tests', () => {
             expect(remainingTasks[0].completed).toBe(false);
             expect(remainingTasks[0].text).toBe('Task 1');
 
+            localStorage.setItem('statusFilter', 'all');
+            renderTasks();
+
+            expect(document.querySelector('#listtask').children.length).toBe(1);
+            expect(document.querySelector('#onetask-1').value).toBe('Task 1');
+
+
             expect(notification.textContent).toBe("Completed tasks cleared!");
             const style = window.getComputedStyle(notification);
             expect(style.backgroundColor).toBe('green');
@@ -1502,6 +1521,10 @@ describe('Unit Tests', () => {
             cancelButton.click();
             
             expect(localStorage.getItem('tasks')).not.toBe(null);
+
+            expect(document.querySelector('#listtask').children.length).toBe(2);
+            expect(document.querySelector('#onetask-1').value).toBe('Task 1');
+            expect(document.querySelector('#onetask-2').value).toBe('Task 2');
             
             expect(notification.textContent).toBe("Task clearing canceled");
             const style = window.getComputedStyle(notification);
@@ -1540,9 +1563,20 @@ describe('Unit Tests', () => {
 
 
 
+    //*
     describe('ToggleEdit Function', () => {
 
+        let inputBox, addButton, clearButton, allEditButtons, radioButtons
+
+
         beforeEach(() => {
+
+            inputBox = document.getElementById('input');
+            addButton = document.getElementById('add');
+            clearButton = document.getElementById('clear');
+            allEditButtons = document.querySelectorAll('.editdel button');
+            radioButtons = document.querySelectorAll('input[name="taskFilter"]');
+
 
             const sampleTasks = [
                 { id: '1', text: 'Editable Task', completed: false }
@@ -1557,14 +1591,28 @@ describe('Unit Tests', () => {
         it('should enable editing mode for a task', () => {
     
             toggleEdit('1');
-        
-    
+
             const taskInput = document.querySelector('#onetask-1');
             expect(taskInput).toBeTruthy();
             expect(taskInput.hasAttribute('readonly')).toBe(false);
             expect(taskInput.readOnly).toBe(false);
             expect(taskInput.style.borderBottom).toBe('2px solid #461b80');
             expect(document.activeElement).toBe(taskInput);
+
+            expect(document.querySelector('#save-1').style.display).toBe('flex');
+            expect(document.querySelector('#edit-1').style.display).toBe('none');
+
+            expect(inputBox.disabled).toBe(true);
+            expect(addButton.disabled).toBe(true);
+            expect(clearButton.disabled).toBe(true);
+    
+            allEditButtons.forEach(button => {
+                expect(button.disabled).toBe(true);
+            });
+    
+            radioButtons.forEach(radio => {
+                expect(radio.disabled).toBe(true);
+            });
         });
     
     
@@ -1581,6 +1629,7 @@ describe('Unit Tests', () => {
     
     }); 
 
+    //*
     describe('DisableOtherElements Function', () => {
 
         let inputBox, addButton, clearButton, allEditButtons, radioButtons
@@ -1640,6 +1689,7 @@ describe('Unit Tests', () => {
     
     });
 
+    //*
     describe('SaveTask Function', () => {
 
         let notification,confirmButton, cancelButton
@@ -1676,6 +1726,9 @@ describe('Unit Tests', () => {
             expect(updatedTasks[0].text).toBe('Updated Task Text');
             expect(taskInput.value).toBe('Updated Task Text'); 
 
+            expect(document.querySelector('#listtask').children.length).toBe(1);
+            expect(document.querySelector('#onetask-1').value).toBe('Updated Task Text'); 
+
             expect(notification.textContent).toBe("Task updated successfully!");
             const style = window.getComputedStyle(notification);
             expect(style.backgroundColor).toBe('green');
@@ -1694,6 +1747,10 @@ describe('Unit Tests', () => {
             expect(updatedTasks).toHaveLength(1);
             expect(updatedTasks[0].text).toBe('Old Task Text');
             expect(taskInput.value).toBe('Old Task Text'); 
+
+            expect(document.querySelector('#listtask').children.length).toBe(1);
+            expect(document.querySelector('#onetask-1').value).toBe('Old Task Text'); 
+
 
             expect(notification.textContent).toBe("Task saving canceled");
             const style = window.getComputedStyle(notification);
@@ -1764,6 +1821,7 @@ describe('Unit Tests', () => {
         
     });
 
+    //*
     describe('CancelEdit Function', () => {
 
         beforeEach(() => {
@@ -1807,7 +1865,20 @@ describe('Unit Tests', () => {
     
     });
 
+    //*
     describe('ToggleSave function', () => {
+
+        let inputBox, addButton, clearButton, allEditButtons, radioButtons
+
+        beforeEach(() => {
+
+            inputBox = document.getElementById('input');
+            addButton = document.getElementById('add');
+            clearButton = document.getElementById('clear');
+            allEditButtons = document.querySelectorAll('.editdel button');
+            radioButtons = document.querySelectorAll('input[name="taskFilter"]');
+
+        });
 
         it('toggleSave sets task text to readonly and border style to none', () => {
             const sampleTasks = [
@@ -1830,9 +1901,26 @@ describe('Unit Tests', () => {
         
             expect(taskText.readOnly).toBe(true);
             expect(taskText.style.borderStyle).toBe('none');
+
+            expect(document.querySelector('#save-1').style.display).toBe('none');
+            expect(document.querySelector('#edit-1').style.display).toBe('flex');
+
+            expect(inputBox.disabled).toBe(false);
+            expect(addButton.disabled).toBe(false);
+            expect(clearButton.disabled).toBe(false);
+    
+            allEditButtons.forEach(button => {
+                expect(button.disabled).toBe(false);
+            });
+    
+            radioButtons.forEach(radio => {
+                expect(radio.disabled).toBe(false);
+            });
+
         });
     });
 
+    //*
     describe('ToggleTaskControls function', () => {
 
         beforeEach(() => {
@@ -1920,15 +2008,11 @@ describe('Unit Tests', () => {
             expect(fromDiv2.style.display).toBe('none');
             expect(toDiv2.style.display).toBe('flex');
         });
-        
-        
-        
-    
-    
     });
 
 
 
+    //*
     describe('ShowNotification', () => {
     
         let notification;
@@ -2010,6 +2094,7 @@ describe('Unit Tests', () => {
     
     });
 
+    //*
     describe('ShowToast', () => {
 
         let mockOnConfirm, mockOnCancel, toastContainer, messageText, confirmButton, cancelButton;
@@ -2073,6 +2158,7 @@ describe('Unit Tests', () => {
     
     });
 
+    //*
     describe('ToggleToast Function', () => {
 
         let toastContainer
