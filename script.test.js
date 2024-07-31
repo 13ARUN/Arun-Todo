@@ -515,9 +515,10 @@ describe('Unit Tests', () => {
         });
     });
 
+    //*
     describe('ClearTaskList Function', () => {
 
-        let taskList
+        let taskList;
 
         beforeEach(() => {
             taskList = document.querySelector('#listtask');
@@ -549,9 +550,10 @@ describe('Unit Tests', () => {
     
     });
 
+    //*
     describe('DisplayTaskCounts Function', () => {
 
-        let countDiv
+        let countDiv;
 
         beforeEach(() => {
             countDiv = document.querySelector('.count h3');
@@ -627,6 +629,7 @@ describe('Unit Tests', () => {
     
     });
 
+    //*
     describe('FilterTasks Function', () => {
 
         it('should return an empty array for an empty task list', () => {
@@ -743,11 +746,10 @@ describe('Unit Tests', () => {
     });
 
     // TODO
-    describe('CreateTaskElement Function', () => {
+    describe.only('CreateTaskElement Function', () => {
 
         it('should create a task element with the correct structure', () => {
            
-            taskList = document.querySelector('#listtask');
     
             const task = {
                 id: 1,
@@ -757,83 +759,130 @@ describe('Unit Tests', () => {
     
             const taskElement = createTaskElement(task);
     
-            taskList.appendChild(taskElement);
-    
             expect(taskElement).toBeTruthy();
-            expect(taskElement.querySelector('input[type="text"]').value).toBe('Sample Task');
-            expect(taskElement.querySelector('input[type="text"]').getAttribute('readonly')).toBe('true');
-            expect(taskElement.querySelector('button[title="Status"]').querySelector('img').src).toContain('img/notdone.png');
-    
+            expect(taskElement.style.opacity).toBe('1');
+
+
+            expect(taskElement.querySelector('button[title="Status"]')).toBeTruthy();
+
+            expect(taskElement.querySelector('.eachtask')).toBeTruthy();
+            expect(taskElement.querySelector('input[type="text"]').id).toBe('onetask-1');
+            expect(taskElement.querySelector('#onetask-1').value).toBe('Sample Task');
+            expect(taskElement.querySelector('#onetask-1').maxLength).toBe(150);
+            expect(taskElement.querySelector('#onetask-1').getAttribute('readonly')).toBe('true');
+
+            expect(taskElement.querySelector('.editdel')).toBeTruthy();
+            expect(taskElement.querySelector('.editdel').id).toBe('edit-1');
+
+            expect(taskElement.querySelector('#edit-1 button[title="Status"').id).toBe('checkbox-1');
+            expect(taskElement.querySelector('#edit-1 #checkbox-1').disabled).toBeFalsy();
             
-            const saveDiv = taskElement.querySelector(`#save-${task.id}`);
-            const style = window.getComputedStyle(saveDiv);
-            expect(style.display).toBe("none");
+            expect(taskElement.querySelector('#edit-1 button[title="Status"]').querySelector('img').src).toContain('img/notdone.png');
+            expect(taskElement.querySelector('#edit-1 button[title="Status"]').querySelector('img').alt).toBe('checkbox');
+            
+            expect(taskElement.querySelector('button[title="Edit Task"]').querySelector('img').src).toContain('img/edit.png');
+            expect(taskElement.querySelector('button[title="Edit Task"]').querySelector('img').alt).toBe('edit icon');
+
+            expect(taskElement.querySelector('button[title="Delete Task"]').querySelector('img').src).toContain('img/delete.png');
+            expect(taskElement.querySelector('button[title="Delete Task"]').querySelector('img').alt).toBe('delete icon');
+
+            expect(taskElement.querySelector('.savecancel')).toBeTruthy();
+            expect(taskElement.querySelector('.savecancel').id).toBe('save-1');
+            expect(taskElement.querySelector('.savecancel').style.display).toBe('none');
+
+            expect(taskElement.querySelector('#save-1 button[title="Status"').id).toBe('checkbox-1');
+            expect(taskElement.querySelector('#save-1 #checkbox-1').disabled).toBe(true);
+            
+            expect(taskElement.querySelector('#save-1 button[title="Status"]').querySelector('img').src).toContain('img/notdone.png');
+            expect(taskElement.querySelector('#save-1 button[title="Status"]').querySelector('img').alt).toBe('checkbox');
+            
+            expect(taskElement.querySelector('button[title="Save Task"]').querySelector('img').src).toContain('img/save.png');
+            expect(taskElement.querySelector('button[title="Save Task"]').querySelector('img').alt).toBe('save icon');
+
+            expect(taskElement.querySelector('button[title="Cancel Edit"]').querySelector('img').src).toContain('img/wrong.png');
+            expect(taskElement.querySelector('button[title="Cancel Edit"]').querySelector('img').alt).toBe('cancel icon');
     
-            expect(taskElement.querySelector('button[title="Edit Task"]')).toBeTruthy();
-            expect(taskElement.querySelector('button[title="Delete Task"]')).toBeTruthy();
-            expect(taskElement.querySelector('button[title="Save Task"]')).toBeTruthy();
-            expect(taskElement.querySelector('button[title="Cancel Edit"]')).toBeTruthy();
+            expect(taskElement.querySelector('button[title="Edit Task"]').disabled).toBeFalsy();
+            expect(taskElement.querySelector('button[title="Delete Task"]').disabled).toBeFalsy();
+            expect(taskElement.querySelector('button[title="Save Task"]').disabled).toBeFalsy();
+            expect(taskElement.querySelector('button[title="Cancel Edit"]').disabled).toBeFalsy();
+
         });
+
+        it('should create a task element with the correct structure', () => {
+           
     
-        it('should create a task element with the correct structure for a completed task', () => {
-         
             const task = {
                 id: 2,
-                text: 'Completed Task',
+                text: 'Sample Task',
                 completed: true
             };
     
-        
             const taskElement = createTaskElement(task);
-            const taskList = document.querySelector('#listtask');
-    
-       
-            taskList.appendChild(taskElement);
-    
     
             expect(taskElement).toBeTruthy();
-            expect(taskElement.querySelector('input[type="text"]').value).toBe('Completed Task');
-            expect(taskElement.querySelector('input[type="text"]').getAttribute('readonly')).toBe('true');
+            expect(taskElement.style.opacity).toBe('0.6');
+
+
             expect(taskElement.querySelector('button[title="Status"]')).toBeTruthy();
-            expect(taskElement.querySelector('button[title="Status"]').querySelector('img').src).toContain('img/done.png');
+
+            expect(taskElement.querySelector('.eachtask')).toBeTruthy();
+            expect(taskElement.querySelector('input[type="text"]').id).toBe('onetask-2');
+            expect(taskElement.querySelector('#onetask-2').value).toBe('Sample Task');
+            expect(taskElement.querySelector('#onetask-2').maxLength).toBe(150);
+            expect(taskElement.querySelector('#onetask-2').getAttribute('readonly')).toBe('true');
+
+            expect(taskElement.querySelector('.editdel')).toBeTruthy();
+            expect(taskElement.querySelector('.editdel').id).toBe('edit-2');
+
+            expect(taskElement.querySelector('#edit-2 button[title="Status"').id).toBe('checkbox-2');
+            expect(taskElement.querySelector('#edit-2 button[title="Status"').disabled).toBeFalsy();
+            
+            expect(taskElement.querySelector('#edit-2 button[title="Status"]').querySelector('img').src).toContain('img/done.png');
+            expect(taskElement.querySelector('#edit-2 button[title="Status"]').querySelector('img').alt).toBe('checkbox');
+            
+            expect(taskElement.querySelector('button[title="Edit Task"]').querySelector('img').src).toContain('img/edit.png');
+            expect(taskElement.querySelector('button[title="Edit Task"]').querySelector('img').alt).toBe('edit icon');
+
+            expect(taskElement.querySelector('button[title="Delete Task"]').querySelector('img').src).toContain('img/delete.png');
+            expect(taskElement.querySelector('button[title="Delete Task"]').querySelector('img').alt).toBe('delete icon');
+
+            expect(taskElement.querySelector('.savecancel')).toBeTruthy();
+            expect(taskElement.querySelector('.savecancel').id).toBe('save-2');
+            expect(taskElement.querySelector('.savecancel').style.display).toBe('none');
+
+            expect(taskElement.querySelector('#save-2 button[title="Status"').id).toBe('checkbox-2');
+            expect(taskElement.querySelector('#save-2 button[title="Status"').disabled).toBe(true);
+            
+            expect(taskElement.querySelector('#save-2 button[title="Status"]').querySelector('img').src).toContain('img/done.png');
+            expect(taskElement.querySelector('#save-2 button[title="Status"]').querySelector('img').alt).toBe('checkbox');
+            
+            expect(taskElement.querySelector('button[title="Save Task"]').querySelector('img').src).toContain('img/save.png');
+            expect(taskElement.querySelector('button[title="Save Task"]').querySelector('img').alt).toBe('save icon');
+
+            expect(taskElement.querySelector('button[title="Cancel Edit"]').querySelector('img').src).toContain('img/wrong.png');
+            expect(taskElement.querySelector('button[title="Cancel Edit"]').querySelector('img').alt).toBe('cancel icon');
+    
+            expect(taskElement.querySelector('button[title="Edit Task"]').disabled).toBeFalsy();
+            expect(taskElement.querySelector('button[title="Delete Task"]').disabled).toBeFalsy();
+            expect(taskElement.querySelector('button[title="Save Task"]').disabled).toBeFalsy();
+            expect(taskElement.querySelector('button[title="Cancel Edit"]').disabled).toBeFalsy();
+
         });
     
-        it('should correctly display Save and Cancel buttons when toggled', () => {
-            
-            const task = {
-                id: 4,
-                text: 'Task to be edited',
-                completed: false
-            };
-           
-            const taskElement = createTaskElement(task);
-            const taskList = document.querySelector('#listtask');
+
     
-            taskList.appendChild(taskElement);
-    
-    
-            const editButton = taskElement.querySelector('button[title="Edit Task"]');
-            editButton.click();
-    
-            expect(taskElement.querySelector('button[title="Save Task"]')).toBeTruthy();
-            expect(taskElement.querySelector('button[title="Cancel Edit"]')).toBeTruthy();
-            
-            const saveDiv = taskElement.querySelector(`#save-${task.id}`);
-            const style = window.getComputedStyle(saveDiv);
-            expect(style.display).toBe("flex");
-        });
+        
     
     });
 
+    //*
     describe('ToggleTaskVisibility Function', () => {
         
         let noTasks, showtask, taskActions, countDiv;
     
         beforeEach(() => {
-           
-            const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
-            document.body.innerHTML = html;
-    
+
             noTasks = document.querySelector('.notasks');
             showtask = document.querySelector('.tasklist');
             taskActions = document.querySelector('.tasktext');

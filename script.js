@@ -185,7 +185,6 @@ function toggleTaskListVisibility(tasks) {
 
 
     if (tasks.length === 0) {
-        taskCountText.textContent = `You have no tasks here!`; 
         noTasks.style.display = 'flex'; 
         showtask.style.display = 'none'; 
         taskActions.style.display = 'none';
