@@ -2853,4 +2853,66 @@ describe('Clear tasks', () => {
 
 });
 
+describe('Components', () => {
+
+    let addButton;
+
+
+    beforeEach(() => {
+
+        const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
+        const cssContent = fs.readFileSync(path.resolve(__dirname, './css/style.css'), 'utf8');
+
+        document.body.innerHTML = html;
+
+        const styleElement = document.createElement('style');
+        styleElement.textContent = cssContent;
+        document.head.appendChild(styleElement);
+
+        ({
+            renderTasks,
+            renderEachTask,
+            addTask,
+            validateInput,
+            checkBox,
+            clearTasks,
+            cancelEdit,
+            isTaskAlreadyExists,
+            filterTasks,
+            deleteTask,
+            saveTask,
+            toggleEdit,
+            toggleSave,
+            showNotification,
+            showToast,
+            clearTaskList,
+            createTaskElement,
+            displayTaskCounts,
+            toggleTaskListVisibility,
+            disableOtherElements,
+            toggleTaskControls,
+            toggleToast
+            } = require('./script.js'));
+
+        addButton = document.querySelector('#add');
+
+
+        jest.resetModules();
+
+    });
+
+
+    it('buttons should be clickable', () => {
+
+        const addTask = jest.fn();
+        
+
+        addButton.click();
+
+        expect(addTask).toHaveBeenCalledTimes(1);
+
+    });
+
+});
+
 
