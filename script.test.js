@@ -1,6 +1,28 @@
 const fs = require('fs');
 const path = require('path');
+const Chance = require('chance');
+const chance = new Chance();
+
 const { fireEvent } = require("@testing-library/dom");
+
+function generateRandomSentence(options) {
+    return chance.sentence(options);
+}
+
+function generateRandomString(options) {
+    return chance.string(options);
+}
+
+function notificationTest (text, color){
+
+    let notification = document.querySelector('.notification');
+
+    expect(notification.textContent).toBe(text);
+    const style = window.getComputedStyle(notification);
+    expect(style.backgroundColor).toBe(color);
+    expect(style.visibility).toBe('visible');
+    
+}
 
 describe('HTML', () => {
 
@@ -783,7 +805,8 @@ describe('Unit Tests', () => {
             expect(inputBox.value).toBe('');
             expect(document.activeElement).not.toBe(inputBox);
     
-            inputBox.value = 'Test Task';
+            let text = generateRandomString({ length: 10 });
+            inputBox.value = text;
             addTask();
 
             const tasks = JSON.parse(localStorage.getItem('tasks'));
@@ -792,7 +815,7 @@ describe('Unit Tests', () => {
     
             expect(tasks).toHaveLength(1);
             expect(tasks[0].id).toBe(1);
-            expect(tasks[0].text).toBe('Test Task');
+            expect(tasks[0].text).toBe(text);
             expect(tasks[0].completed).toBe(false);
 
             expect(taskIdCounter).toBe(1);
@@ -804,10 +827,9 @@ describe('Unit Tests', () => {
 
             expect(inputBox.value).toBe('');
             expect(document.activeElement).toBe(inputBox);
+
+            notificationTest("Task added successfully",'green');
             
-            expect(notification.textContent).toBe("Task added successfully");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('green');
         });
 
         it('should add a task and update localStorage when a task already exists', () => {
@@ -873,10 +895,8 @@ describe('Unit Tests', () => {
             expect(inputBox.value).toBe('');
             const styleInputBox = window.getComputedStyle(inputBox);
             expect(styleInputBox.borderBottom).toBe('2px solid red');
-    
-            expect(notification.textContent).toBe("Task already exists!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+
+            notificationTest("Task already exists!",'rgb(184, 13, 13)');
         });
     
         it('should treat tasks with different cases as duplicates', () => {
@@ -891,9 +911,8 @@ describe('Unit Tests', () => {
 
             expect(tasks).toHaveLength(1);
 
-            expect(notification.textContent).toBe("Task already exists!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            notificationTest("Task already exists!",'rgb(184, 13, 13)');
+
         });
     
         it('should not add a task if input is empty', () => {
@@ -908,10 +927,8 @@ describe('Unit Tests', () => {
             expect(inputBox.value).toBe('');
             const styleInputBox = window.getComputedStyle(inputBox);
             expect(styleInputBox.borderBottom).toBe('2px solid red');
-    
-            expect(notification.textContent).toBe("Task cannot be empty!!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+
+            notificationTest("Task cannot be empty!!",'rgb(184, 13, 13)');
             
         });
     
@@ -926,10 +943,8 @@ describe('Unit Tests', () => {
             expect(tasks).toBeNull();
     
             const notification = document.querySelector('.notification');
-    
-            expect(notification.textContent).toBe("Task cannot contain only spaces!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+
+            notificationTest("Task cannot contain only spaces!",'rgb(184, 13, 13)');
             
         });
     
@@ -939,14 +954,6 @@ describe('Unit Tests', () => {
     //*
     describe('ValidateInput function', () => {
 
-        let notification;
-
-        beforeEach(() => {
-
-            notification = document.querySelector('.notification');
-        });
-
-
         it('should return false if input is empty', () => {
 
             const inputValue = '';
@@ -955,9 +962,7 @@ describe('Unit Tests', () => {
     
             expect(result).toBe(false);
 
-            expect(notification.textContent).toBe("Task cannot be empty!!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            notificationTest("Task cannot be empty!!",'rgb(184, 13, 13)');
             
         });
     
@@ -969,9 +974,7 @@ describe('Unit Tests', () => {
     
             expect(result).toBe(false);
 
-            expect(notification.textContent).toBe("Task cannot contain only spaces!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            notificationTest("Task cannot contain only spaces!",'rgb(184, 13, 13)');
             
         });
 
@@ -988,9 +991,7 @@ describe('Unit Tests', () => {
     
             expect(result).toBe(false);
 
-            expect(notification.textContent).toBe("Task already exists!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('rgb(184, 13, 13)');
+            notificationTest("Task already exists!",'rgb(184, 13, 13)');
             
         });
 
@@ -1208,11 +1209,10 @@ describe('Unit Tests', () => {
     //* 
     describe('Delete Function', () => {
 
-        let notification, confirmButton, cancelButton
+        let confirmButton, cancelButton
 
         beforeEach(() => {
 
-            notification = document.querySelector('.notification');
             confirmButton = document.getElementById('confirm-button');
             cancelButton = document.getElementById('cancel-button');
 
@@ -1239,9 +1239,7 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#listtask').children.length).toBe(0);
             expect(document.querySelector('#onetask-1')).toBeNull(); 
 
-            expect(notification.textContent).toBe("Task deleted successfully");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('green');
+            notificationTest("Task deleted successfully",'green');
     
         });
     
@@ -1257,9 +1255,7 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#listtask').children.length).toBe(1);
             expect(document.querySelector('#onetask-1')).toBeTruthy(); 
 
-            expect(notification.textContent).toBe("Task deletion canceled");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('red');
+            notificationTest("Task deletion canceled",'red');
     
     
         });
@@ -1298,7 +1294,7 @@ describe('Unit Tests', () => {
     //*
     describe('ClearTasks Function', () => {
 
-        let confirmButton, cancelButton, notification
+        let confirmButton, cancelButton
 
         beforeEach(() => {
 
@@ -1313,7 +1309,6 @@ describe('Unit Tests', () => {
 
             confirmButton = document.getElementById('confirm-button');
             cancelButton = document.getElementById('cancel-button');
-            notification = document.querySelector('.notification');
         });
 
         it('should display the correct confirmation message for different filters', () => {
@@ -1353,9 +1348,7 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#onetask-1')).toBeNull();
             expect(document.querySelector('#onetask-2')).toBeNull();
 
-            expect(notification.textContent).toBe("All tasks cleared!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('green');
+            notificationTest("All tasks cleared!",'green');
 
         });
 
@@ -1378,10 +1371,8 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#listtask').children.length).toBe(1);
             expect(document.querySelector('#onetask-2').value).toBe('Task 2');
 
+            notificationTest("Inprogress tasks cleared!",'green');
 
-            expect(notification.textContent).toBe("Inprogress tasks cleared!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('green');
         });
 
         it('should clear only completed tasks when filter is "completed"', () => {
@@ -1403,10 +1394,7 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#listtask').children.length).toBe(1);
             expect(document.querySelector('#onetask-1').value).toBe('Task 1');
 
-
-            expect(notification.textContent).toBe("Completed tasks cleared!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('green');
+            notificationTest("Completed tasks cleared!",'green');
         });
 
         it('should cancel clear when cancel button is clicked', () => {
@@ -1422,10 +1410,8 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#listtask').children.length).toBe(2);
             expect(document.querySelector('#onetask-1').value).toBe('Task 1');
             expect(document.querySelector('#onetask-2').value).toBe('Task 2');
-            
-            expect(notification.textContent).toBe("Task clearing canceled");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('red');
+
+            notificationTest("Task clearing canceled",'red');
         });
 
         it('should handle case where there are no tasks to clear', () => {
@@ -1589,11 +1575,10 @@ describe('Unit Tests', () => {
     //*
     describe('SaveTask Function', () => {
 
-        let notification,confirmButton, cancelButton
+        let confirmButton, cancelButton
 
         beforeEach(() => {
 
-            notification = document.querySelector('.notification');
             confirmButton = document.getElementById('confirm-button');
             cancelButton = document.getElementById('cancel-button');
             
@@ -1626,9 +1611,8 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#listtask').children.length).toBe(1);
             expect(document.querySelector('#onetask-1').value).toBe('Updated Task Text'); 
 
-            expect(notification.textContent).toBe("Task updated successfully!");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('green');
+            notificationTest("Task updated successfully!",'green');
+
         });
     
         it('should cancel saving of task text and re-render tasks', () => {
@@ -1648,10 +1632,8 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#listtask').children.length).toBe(1);
             expect(document.querySelector('#onetask-1').value).toBe('Old Task Text'); 
 
+            notificationTest("Task saving canceled",'red');
 
-            expect(notification.textContent).toBe("Task saving canceled");
-            const style = window.getComputedStyle(notification);
-            expect(style.backgroundColor).toBe('red');
         });
     
         
@@ -1662,14 +1644,13 @@ describe('Unit Tests', () => {
             taskInput.value = '';
             saveTask('1');
     
-    
             const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
             expect(updatedTasks).toHaveLength(1);
             expect(updatedTasks[0].text).toBe('Old Task Text');
             expect(taskInput.value).toBe(''); 
-    
-            const notificationElement = document.querySelector('.notification');
-            expect(notificationElement.textContent).toBe('Task cannot be empty!!'); 
+
+            notificationTest("Task cannot be empty!!",'rgb(184, 13, 13)');
+
         });
     
         it('should not update task text when input empty and re-render tasks', () => {
@@ -1681,9 +1662,9 @@ describe('Unit Tests', () => {
             const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
             expect(updatedTasks).toHaveLength(1);
             expect(updatedTasks[0].text).toBe('Old Task Text');
+
+            notificationTest("Task cannot contain only spaces!",'rgb(184, 13, 13)');
     
-            const notificationElement = document.querySelector('.notification');
-            expect(notificationElement.textContent).toBe('Task cannot contain only spaces!'); // Example error message
         });
     
         test('should not allow saving a task with text that already exists', () => {
@@ -1703,9 +1684,8 @@ describe('Unit Tests', () => {
             saveTask('1'); 
     
             confirmButton.click();
-        
-            const notificationElement = document.querySelector('.notification');
-            expect(notificationElement.textContent).toBe('Task already exists!');
+
+            notificationTest("Task already exists!",'rgb(184, 13, 13)');
     
             expect(localStorage.getItem('tasks')).toBe(JSON.stringify([
                 { id: 1, text: 'Existing Task', completed: false },
@@ -2111,49 +2091,45 @@ describe('Unit Tests', () => {
 describe('Integration Tests', () => {
 
 
-let form;
-let addButton;
-let taskList;
-let countText;
-let inputBox;
+    let form,addButton,taskList,countText,inputBox;
 
 
 beforeEach(() => {
 
-    const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
-    const cssContent = fs.readFileSync(path.resolve(__dirname, './css/style.css'), 'utf8');
+const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
+const cssContent = fs.readFileSync(path.resolve(__dirname, './css/style.css'), 'utf8');
 
-    document.body.innerHTML = html;
+document.body.innerHTML = html;
 
-    const styleElement = document.createElement('style');
-    styleElement.textContent = cssContent;
-    document.head.appendChild(styleElement);
+const styleElement = document.createElement('style');
+styleElement.textContent = cssContent;
+document.head.appendChild(styleElement);
 
-    require('./script.js');
+require('./script.js');
 
-    inputBox = document.querySelector('#input');
-    form = document.querySelector('form');
-    addButton = document.querySelector('#add');
-    taskList = document.querySelector('#listtask');
-    countText = document.querySelector('.count h3');
+inputBox = document.querySelector('#input');
+form = document.querySelector('form');
+addButton = document.querySelector('#add');
+taskList = document.querySelector('#listtask');
+countText = document.querySelector('.count h3');
 
-    const mockLocalStorage = (() => {
-        let store = {};
-        return {
-            getItem: (key) => store[key] || null,
-            setItem: (key, value) => (store[key] = value.toString()),
-            clear: () => (store = {}),
-            removeItem: (key) => delete store[key],
-        };
-    })();
-    Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
+const mockLocalStorage = (() => {
+    let store = {};
+    return {
+        getItem: (key) => store[key] || null,
+        setItem: (key, value) => (store[key] = value.toString()),
+        clear: () => (store = {}),
+        removeItem: (key) => delete store[key],
+    };
+})();
+Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
 
-    jest.resetModules();
-    localStorage.clear();
+jest.resetModules();
+localStorage.clear();
 
-    
 
-    
+
+
 });
 
 afterEach(() => {
@@ -2163,6 +2139,7 @@ afterEach(() => {
 describe('DOM content load', () => {
 
     it('should render tasks based on saved filter when DOMContentLoaded is fired', () => {
+
         const savedFilter = 'completed';
         localStorage.setItem('statusFilter', savedFilter);
         localStorage.setItem('taskIdCounter', '0');
@@ -2176,19 +2153,19 @@ describe('DOM content load', () => {
 
     it('should increment taskIdCounter when a task is added', () => {
         
-    
-        inputBox.value = 'Test Task 1';
-        addButton.click();
+        inputBox.value = generateRandomString({ length: 10 });
+        fireEvent.click(addButton);
     
         expect(localStorage.getItem('taskIdCounter')).toBe('1');
     
-        inputBox.value = 'Test Task 2';
-        addButton.click();
+        inputBox.value = generateRandomString({ length: 10 });
+        fireEvent.click(addButton);
     
         expect(localStorage.getItem('taskIdCounter')).toBe('2');
       });
 
     it('should set default filter to "all" if no saved filter is found when DOMContentLoaded is fired', () => {
+
         localStorage.setItem('taskIdCounter', '0');
 
         document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -2205,7 +2182,7 @@ describe('DOM content load', () => {
         
         expect(localStorage.getItem('taskIdCounter')).toBe('10');
     });
-})
+});
 
 describe('Adding a Task', () => {
 
