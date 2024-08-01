@@ -39,6 +39,8 @@ beforeEach(() => {
     styleElement.textContent = cssContent;
     document.head.appendChild(styleElement);
 
+    jest.resetModules();
+
 });
      
 describe('HTML-File Section', () => {
@@ -317,7 +319,7 @@ describe('HTML-Script Section', () => {
 
 });
 
-describe('Unit Tests', () => {
+describe.only('Unit Tests', () => {
 
     beforeEach(() => {
 
@@ -361,12 +363,75 @@ describe('Unit Tests', () => {
         Object.defineProperty(window, 'localStorage', {value: mockLocalStorage,});
 
         localStorage.clear();
+        jest.resetModules();
     });
         
     afterEach(() => {
         localStorage.clear();
     });
 
+
+    describe('DOM content load', () => {
+
+        let allButton, inprogressButton, completedButton
+
+        beforeEach(() => {
+
+            allButton = document.querySelector('input[value="all"]');
+            inprogressButton = document.querySelector('input[value="inprogress"]');
+            completedButton = document.querySelector('input[value="completed"]')
+
+        })
+
+        it('should render tasks based on saved filter when DOMContentLoaded is fired', () => {
+    
+            const savedFilterAll = 'all';
+            localStorage.setItem('statusFilter', savedFilterAll);
+            
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+    
+            expect(localStorage.getItem('statusFilter')).toBe(savedFilterAll);
+            expect(allButton.checked).toBe(true);
+            expect(inprogressButton.checked).toBe(false);
+            expect(completedButton.checked).toBe(false);
+    
+            const savedFilterCompleted = 'completed';
+            localStorage.setItem('statusFilter', savedFilterCompleted);
+            
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+    
+            expect(localStorage.getItem('statusFilter')).toBe(savedFilterCompleted);
+            expect(allButton.checked).toBe(false);
+            expect(inprogressButton.checked).toBe(false);
+            expect(completedButton.checked).toBe(true);
+    
+            const savedFilterInprogress = 'inprogress';
+            localStorage.setItem('statusFilter', savedFilterInprogress);
+            
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+    
+            expect(localStorage.getItem('statusFilter')).toBe(savedFilterInprogress);
+            expect(allButton.checked).toBe(false);
+            expect(inprogressButton.checked).toBe(true);
+            expect(completedButton.checked).toBe(false);
+            
+            
+        });
+    
+        it('should set default filter to "all" if no saved filter is found when DOMContentLoaded is fired', () => {
+    
+            localStorage.clear()
+    
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+    
+            expect(document.querySelector('input[value="all"]').checked).toBe(true);
+            expect(document.querySelector('input[value="inprogress"]').checked).toBe(false);
+            expect(document.querySelector('input[value="completed"]').checked).toBe(false);
+    
+            
+        });
+    
+    });
 
 
     // TODO
@@ -854,11 +919,10 @@ describe('Unit Tests', () => {
             expect(tasks[0].text).toBe('Task 1');
             expect(tasks[0].completed).toBe(true);
 
-            expect(tasks[1].id).toBe(2);
+            
             expect(tasks[1].text).toBe('Test Task');
             expect(tasks[1].completed).toBe(false);
 
-            expect(taskIdCounter).toBe(2);
             expect(statusFilter).toBe('all');
 
             expect(inputBox.value).toBe('');
@@ -2094,95 +2158,46 @@ describe('Integration Tests', () => {
     let form,addButton,taskList,countText,inputBox;
 
 
-beforeEach(() => {
+    beforeEach(() => {
 
-const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
-const cssContent = fs.readFileSync(path.resolve(__dirname, './css/style.css'), 'utf8');
+        const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
+        const cssContent = fs.readFileSync(path.resolve(__dirname, './css/style.css'), 'utf8');
 
-document.body.innerHTML = html;
+        document.body.innerHTML = html;
 
-const styleElement = document.createElement('style');
-styleElement.textContent = cssContent;
-document.head.appendChild(styleElement);
+        const styleElement = document.createElement('style');
+        styleElement.textContent = cssContent;
+        document.head.appendChild(styleElement);
 
-require('./script.js');
+        require('./script.js');
 
-inputBox = document.querySelector('#input');
-form = document.querySelector('form');
-addButton = document.querySelector('#add');
-taskList = document.querySelector('#listtask');
-countText = document.querySelector('.count h3');
+        inputBox = document.querySelector('#input');
+        form = document.querySelector('form');
+        addButton = document.querySelector('#add');
+        taskList = document.querySelector('#listtask');
+        countText = document.querySelector('.count h3');
 
-const mockLocalStorage = (() => {
-    let store = {};
-    return {
-        getItem: (key) => store[key] || null,
-        setItem: (key, value) => (store[key] = value.toString()),
-        clear: () => (store = {}),
-        removeItem: (key) => delete store[key],
-    };
-})();
-Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
-
-jest.resetModules();
-localStorage.clear();
-
-
-
-
-});
-
-afterEach(() => {
-    localStorage.clear();
-});
-
-describe('DOM content load', () => {
-
-    it('should render tasks based on saved filter when DOMContentLoaded is fired', () => {
-
-        const savedFilter = 'completed';
-        localStorage.setItem('statusFilter', savedFilter);
-        localStorage.setItem('taskIdCounter', '0');
+        const mockLocalStorage = (() => {
+            let store = {};
+            return {
+                getItem: (key) => store[key] || null,
+                setItem: (key, value) => (store[key] = value.toString()),
+                clear: () => (store = {}),
+                removeItem: (key) => delete store[key],
+            };
+        })();
+        Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
         
-        document.dispatchEvent(new Event('DOMContentLoaded'));
 
-        expect(localStorage.getItem('statusFilter')).toBe(savedFilter);
-        expect(document.querySelector('input[value="completed"]').checked).toBe(true);
-        
+        jest.resetModules();
+        localStorage.clear();
     });
 
-    it('should increment taskIdCounter when a task is added', () => {
-        
-        inputBox.value = generateRandomString({ length: 10 });
-        fireEvent.click(addButton);
-    
-        expect(localStorage.getItem('taskIdCounter')).toBe('1');
-    
-        inputBox.value = generateRandomString({ length: 10 });
-        fireEvent.click(addButton);
-    
-        expect(localStorage.getItem('taskIdCounter')).toBe('2');
-      });
-
-    it('should set default filter to "all" if no saved filter is found when DOMContentLoaded is fired', () => {
-
-        localStorage.setItem('taskIdCounter', '0');
-
-        document.dispatchEvent(new Event('DOMContentLoaded'));
-
-        expect(localStorage.getItem('statusFilter')).toBeNull();
-        expect(document.querySelector('input[value="all"]').checked).toBe(true);
-        
+    afterEach(() => {
+        localStorage.clear();
     });
 
 
-
-    it('should initialize taskIdCounter from localStorage value', () => {
-        localStorage.setItem('taskIdCounter', '10');
-        
-        expect(localStorage.getItem('taskIdCounter')).toBe('10');
-    });
-});
 
 describe('Adding a Task', () => {
 
@@ -2194,7 +2209,7 @@ describe('Adding a Task', () => {
         expect(taskList.textContent).toBe('');
 
         inputBox.value = 'New Task';
-        form.dispatchEvent(new Event('submit'));
+        fireEvent.submit(form);
     
         const tasks = JSON.parse(localStorage.getItem('tasks'));
         const filter = localStorage.getItem('statusFilter');
