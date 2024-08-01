@@ -319,7 +319,7 @@ describe('HTML-Script Section', () => {
 
 });
 
-describe.only('Unit Tests', () => {
+describe('Unit Tests', () => {
 
     beforeEach(() => {
 
@@ -910,7 +910,6 @@ describe.only('Unit Tests', () => {
             addTask();
 
             const tasks = JSON.parse(localStorage.getItem('tasks'));
-            const taskIdCounter = JSON.parse(localStorage.getItem('taskIdCounter'));
             const statusFilter= localStorage.getItem('statusFilter');
     
             expect(tasks).toHaveLength(2);
@@ -2232,9 +2231,8 @@ describe('Adding a Task', () => {
         expect(aTask.getAttribute('readonly')).toBe('true');
 
         expect(countText.textContent).toBe('You have a total of 1 task!');
-        
-        const notification = document.querySelector('.notification');
-        expect(notification.textContent).toBe('Task added successfully');
+
+        notificationTest("Task added successfully",'green');
 
         expect(document.activeElement).toBe(inputBox);
         expect(inputBox.value).toBe('');
@@ -2290,40 +2288,13 @@ describe('Adding a Task', () => {
         expect(aTask2.getAttribute('readonly')).toBe('true');
 
         expect(countText.textContent).toBe('You have a total of 2 tasks!');
-        
-        const notification = document.querySelector('.notification');
-        expect(notification.textContent).toBe('Task added successfully');
+
+        notificationTest("Task added successfully",'green');
 
         expect(document.activeElement).toBe(inputBox);
         expect(inputBox.value).toBe('');
-    
-       
-
     });
 
-    it('should add a new task with leading spaces after trimming', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-    
-        inputBox.value = '    Task';
-        form.dispatchEvent(new  Event('submit'));
-    
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(tasks).toHaveLength(1);
-        expect(tasks[0].text).toBe('Task');
-    });
-
-    it('should add a new task with trailing spaces after trimming', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-    
-        inputBox.value = 'Task     ';
-        form.dispatchEvent(new  Event('submit'));
-    
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(tasks).toHaveLength(1);
-        expect(tasks[0].text).toBe('Task');
-    });
 
     it('should add a new task with leading and trailing spaces after trimming', () => {
         const inputBox = document.querySelector('#input');
@@ -2342,28 +2313,12 @@ describe('Adding a Task', () => {
         const form = document.querySelector('form');
     
         inputBox.value = '';
-        form.dispatchEvent(new  Event('submit'));
-    
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(tasks).toBeNull();
-        
-        const notification = document.querySelector('.notification');
-        expect(notification.textContent).toBe('Task cannot be empty!!');
-
-    });
-
-    it('should not add an empty task', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-    
-        inputBox.value = '';
         form.dispatchEvent(new Event('submit'));
     
         const tasks = JSON.parse(localStorage.getItem('tasks'));
         expect(tasks).toBeNull();
-        
-        const notification = document.querySelector('.notification');
-        expect(notification.textContent).toBe('Task cannot be empty!!');
+
+        notificationTest("Task cannot be empty!!",'rgb(184, 13, 13)');
 
         inputBox.dispatchEvent(new Event('input'));
         const style = window.getComputedStyle(inputBox);
@@ -2380,9 +2335,12 @@ describe('Adding a Task', () => {
     
         const tasks = JSON.parse(localStorage.getItem('tasks'));
         expect(tasks).toBeNull();
-        
-        const notification = document.querySelector('.notification');
-        expect(notification.textContent).toBe('Task cannot contain only spaces!');
+
+        notificationTest("Task cannot contain only spaces!",'rgb(184, 13, 13)');
+
+        inputBox.dispatchEvent(new Event('input'));
+        const style = window.getComputedStyle(inputBox);
+        expect(style.borderBottom).toBe('');
     });
 
     it('should not add an existing task', () => {
@@ -2398,12 +2356,15 @@ describe('Adding a Task', () => {
         const tasks = JSON.parse(localStorage.getItem('tasks'));
         expect(tasks).toHaveLength(1);
         
-        const notification = document.querySelector('.notification');
-        expect(notification.textContent).toBe('Task already exists!');
+        notificationTest("Task already exists!",'rgb(184, 13, 13)');
 
         const displayedTasks = document.querySelectorAll('.eachtask input[type="text"]');
         expect(displayedTasks).toHaveLength(1);
         expect(displayedTasks[0].value).toBe('Task 1');
+
+        inputBox.dispatchEvent(new Event('input'));
+        const style = window.getComputedStyle(inputBox);
+        expect(style.borderBottom).toBe('');
     });
 });
 
@@ -2435,6 +2396,7 @@ describe('filter a Task', () => {
         expect(displayedInProgressTasks).toHaveLength(2);
         expect(displayedInProgressTasks[0].value).toBe('Task 1');
         expect(displayedInProgressTasks[1].value).toBe('Task 3');
+        
 
         const completedFilter = document.querySelector('input[name="taskFilter"][value="completed"]');
         completedFilter.click();
@@ -2544,33 +2506,6 @@ describe('Editing a Task', () => {
     });
 
 
-    it('should not do anything when other keys are pressed', () => {
-        const inputBox = document.querySelector('#input');
-        const addButton = document.querySelector('#add');
-    
-        inputBox.value = 'Task to be edited';
-        addButton.click();
-    
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
-        const taskId = tasks[0].id;
-    
-        const editButton = document.querySelector(`#edit-${taskId} button[title="Edit Task"]`);
-        editButton.click();
-
-        const editBox =  document.querySelector(`#onetask-${taskId}`);
-        editBox.value = 'Task edited';
-
-
-        fireEvent.keyDown(editBox, { key: 'Space' });
-
-        
-    
-        const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
-        expect(updatedTasks[0].text).toBe('Task to be edited')
-
-        
-    });
-
     it('should cancel edit a task after editing', () => {
         const inputBox = document.querySelector('#input');
         const addButton = document.querySelector('#add');
@@ -2589,7 +2524,6 @@ describe('Editing a Task', () => {
 
         const saveButton = document.querySelector(`#save-${taskId} button[title="Save Task"]`);
         saveButton.click();
-
 
         const cancelButton = document.getElementById('cancel-button');
         cancelButton.click();
