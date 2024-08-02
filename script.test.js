@@ -5,6 +5,8 @@ const chance = new Chance();
 
 const { fireEvent } = require("@testing-library/dom");
 
+//* Helper Functions
+
 function generateRandomSentence(options) {
     return chance.sentence(options);
 }
@@ -23,6 +25,56 @@ function notificationTest (text, color){
     expect(style.visibility).toBe('visible');
     
 }
+
+function generateTasks(param, randomText = true, statuses = false) {
+
+    const tasks = [];
+    let count;
+    let ids;
+
+    if (Array.isArray(param)) {
+        ids = param;
+        count = ids.length;
+    } else {
+        count = param;
+    }
+
+    for (let i = 0; i < count; i++) {
+        const task = {
+            id: ids ? ids[i] : i + 1,
+            text: randomText ? generateRandomString({ length: 10 }) : `Task ${i + 1}`,
+            completed: Array.isArray(statuses) ? statuses[i] !== undefined ? statuses[i] : false : statuses
+        };
+        tasks.push(task);    
+    }
+    return tasks;
+}
+
+
+function objectsOfArray(taskArray) {
+    return Object.assign({}, ...taskArray);
+}
+
+const setLocalStorageItem = (key, value) => {
+    localStorage.setItem(key, value);
+};
+
+const getLocalStorageItem = (key) => {
+    switch (key) {
+        case 'tasks':
+            return JSON.parse(localStorage.getItem(key));
+        case 'taskIdCounter':
+            return JSON.parse(localStorage.getItem(key));
+        case 'statusFilter':
+            return localStorage.getItem(key);
+        default:
+            return null;
+    }
+};
+
+const clearLocalStorage = () => {
+    localStorage.clear();
+};
 
 describe('HTML', () => {
 
@@ -141,6 +193,7 @@ describe('HTML-Task Input Section', () => {
         expect(addBtn.type).toBe('submit');
         expect(addBtn.id).toBe('add');
         expect(addBtn.title).toBe('Add');
+        expect(addBtn.disabled).toBe(false);
         expect(addBtn.contains(addBtnImg)).toBe(true);
         expect(addBtnImg.src).toContain('img/taskadd.png');
         expect(addBtnImg.alt).toBe('add icon'); 
@@ -176,6 +229,7 @@ describe('HTML-Task Filter Section', () => {
         expect(allRadioBtn).toBeTruthy();
         expect(allRadioLabel).toBeTruthy();
         expect(taskFilterClr.contains(allRadioBtn) && taskFilterClr.contains(allRadioLabel)).toBe(true);
+        expect(allRadioBtn.disabled).toBe(false);
         expect(allRadioBtn.value).toBe('all');
         expect(allRadioLabel.textContent).toBe('All');
         expect(allRadioLabel.getAttribute('for')).toBe('all');
@@ -184,6 +238,7 @@ describe('HTML-Task Filter Section', () => {
         expect(inprogressRadioBtn).toBeTruthy();
         expect(inprogressRadioLabel).toBeTruthy();
         expect(taskFilterClr.contains(inprogressRadioBtn) && taskFilterClr.contains(inprogressRadioLabel)).toBe(true);
+        expect(inprogressRadioBtn.disabled).toBe(false);
         expect(inprogressRadioBtn.getAttribute('value')).toBe('inprogress');
         expect(inprogressRadioLabel.textContent).toBe('In Progress');
         expect(inprogressRadioLabel.getAttribute('for')).toBe('inprogress');
@@ -192,6 +247,7 @@ describe('HTML-Task Filter Section', () => {
         expect(completedRadioBtn).toBeTruthy();
         expect(completedRadioLabel).toBeTruthy();
         expect(taskFilterClr.contains(completedRadioBtn) && taskFilterClr.contains(completedRadioLabel)).toBe(true);
+        expect(completedRadioBtn.disabled).toBe(false);
         expect(completedRadioBtn.value).toBe('completed');   
         expect(completedRadioLabel.textContent).toBe('Completed');
         expect(completedRadioLabel.getAttribute('for')).toBe('completed');
@@ -257,6 +313,7 @@ describe('HTML-Task Count and Clear Section', () => {
         expect(countDiv.contains(h3Element)).toBe(true);
         expect(h3Element.textContent).toBe('You have no tasks here!');
         expect(clearBtn).toBeTruthy();
+        expect(clearBtn.disabled).toBe(false);
         expect(clearBtn.disabled).toBeFalsy();
         expect(clearBtn.title).toBe('Clear'); 
         expect(clearBtn.textContent).toBe('Clear Tasks');
@@ -289,7 +346,7 @@ describe('HTML-Toast Message Section', () => {
         toastBtn = document.querySelector('.button-container');
         toasth3 = document.querySelector('.button-container h3');
         confirmBtn = document.querySelector('#confirm-button');
-        CancelBtn = document.querySelector('#cancel-button');
+        cancelBtn = document.querySelector('#cancel-button');
     })
 
     it('should have all elements in Toast Message Div', () => {
@@ -299,11 +356,13 @@ describe('HTML-Toast Message Section', () => {
         expect(toastMsgDiv.contains(toastSpan)).toBe(true);
         expect(toastMsgDiv.contains(toastBtn)).toBe(true);
         expect(toastBtn.contains(confirmBtn)).toBe(true);
-        expect(toastBtn.contains(CancelBtn)).toBe(true);
+        expect(toastBtn.contains(cancelBtn)).toBe(true);
         expect(toastBtn.contains(toasth3)).toBe(true);
         expect(toastBtn.contains(toasth3)).toBe(true);
         expect(confirmBtn.textContent).toBe('Yes');
-        expect(CancelBtn.textContent).toBe('No');
+        expect(confirmBtn.disabled).toBe(false);
+        expect(cancelBtn.textContent).toBe('No');
+        expect(cancelBtn.disabled).toBe(false);
     });  
 });
 
@@ -386,31 +445,31 @@ describe('Unit Tests', () => {
         it('should render tasks based on saved filter when DOMContentLoaded is fired', () => {
     
             const savedFilterAll = 'all';
-            localStorage.setItem('statusFilter', savedFilterAll);
+            setLocalStorageItem('statusFilter', savedFilterAll);
             
             document.dispatchEvent(new Event('DOMContentLoaded'));
     
-            expect(localStorage.getItem('statusFilter')).toBe(savedFilterAll);
+            expect(getLocalStorageItem ('statusFilter')).toBe(savedFilterAll);
             expect(allButton.checked).toBe(true);
             expect(inprogressButton.checked).toBe(false);
             expect(completedButton.checked).toBe(false);
     
             const savedFilterCompleted = 'completed';
-            localStorage.setItem('statusFilter', savedFilterCompleted);
+            setLocalStorageItem('statusFilter', savedFilterCompleted);
             
             document.dispatchEvent(new Event('DOMContentLoaded'));
     
-            expect(localStorage.getItem('statusFilter')).toBe(savedFilterCompleted);
+            expect(getLocalStorageItem ('statusFilter')).toBe(savedFilterCompleted);
             expect(allButton.checked).toBe(false);
             expect(inprogressButton.checked).toBe(false);
             expect(completedButton.checked).toBe(true);
     
             const savedFilterInprogress = 'inprogress';
-            localStorage.setItem('statusFilter', savedFilterInprogress);
+            setLocalStorageItem('statusFilter', savedFilterInprogress);
             
             document.dispatchEvent(new Event('DOMContentLoaded'));
     
-            expect(localStorage.getItem('statusFilter')).toBe(savedFilterInprogress);
+            expect(getLocalStorageItem ('statusFilter')).toBe(savedFilterInprogress);
             expect(allButton.checked).toBe(false);
             expect(inprogressButton.checked).toBe(true);
             expect(completedButton.checked).toBe(false);
@@ -420,7 +479,7 @@ describe('Unit Tests', () => {
     
         it('should set default filter to "all" if no saved filter is found when DOMContentLoaded is fired', () => {
     
-            localStorage.clear()
+            clearLocalStorage();
     
             document.dispatchEvent(new Event('DOMContentLoaded'));
     
@@ -443,8 +502,8 @@ describe('Unit Tests', () => {
                 { id: 1, text: 'Task 1', completed: false },
                 { id: 2, text: 'Task 2', completed: true }
             ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('statusFilter', 'all');
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('statusFilter', 'all');
     
             renderTasks();
            
@@ -455,7 +514,7 @@ describe('Unit Tests', () => {
     
         it('should render tasks with empty array', () => {
             
-            localStorage.clear();
+            clearLocalStorage();
     
             renderTasks();
     
@@ -595,43 +654,34 @@ describe('Unit Tests', () => {
         });
     
         it('should return an empty array if no tasks match the filter inprogress', () => {
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: true },
-                { id: 2, text: 'Task 2', completed: true },
-            ];
+
+            const tasks = generateTasks(2, false, true);
+ 
             const filteredTasks = filterTasks(tasks, 'inprogress');
             expect(filteredTasks).toEqual([]);
         });
     
         it('should return an empty array if no tasks match the filter completed', () => {
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: false },
-            ];
+
+            const tasks = generateTasks(2, false, false);
+
             const filteredTasks = filterTasks(tasks, 'completed');
             expect(filteredTasks).toEqual([]);
         });
     
         it('should correctly filter tasks based on completion status', () => {
-            const tasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2', completed: true },
-                { id: 3, text: 'Task 3', completed: false },
-            ];
+
+            const tasks = generateTasks(5, false, [false, true, false, false, true]);
+            
     
             const filteredAllTasks = filterTasks(tasks, 'all');
             expect(filteredAllTasks).toEqual(tasks);
         
             const filteredInProgressTasks = filterTasks(tasks, 'inprogress');
-            expect(filteredInProgressTasks).toEqual([
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 3, text: 'Task 3', completed: false },
-            ]);
+            expect(filteredInProgressTasks).toEqual(tasks.filter(task => !task.completed));
         
             const filteredCompletedTasks = filterTasks(tasks, 'completed');
-            expect(filteredCompletedTasks).toEqual([
-                { id: 2, text: 'Task 2', completed: true },
-            ]);
+            expect(filteredCompletedTasks).toEqual(tasks.filter(task => task.completed));
         });
     });
 
@@ -647,32 +697,30 @@ describe('Unit Tests', () => {
     
         test('should create and append a task element with correct content', () => {
             
-            const task = {
-                id: 1,
-                text: 'Sample Task',
-                completed: false
-            };
-    
-            renderEachTask(task);
+            const task = generateTasks(1, false, false);
+
+            const taskObject = objectsOfArray(task);
+            
+
+            renderEachTask(taskObject);
 
             expect(taskList.children.length).toBe(1);
             expect(taskList.querySelector('.atask')).toBeTruthy();
-            expect(document.querySelector('.atask').style.opacity).toBe('1');
+            expect(taskList.querySelector('.atask').style.opacity).toBe('1');
         });
 
         test('should create and append a task element with correct content', () => {
             
-            const task = {
-                id: 1,
-                text: 'Sample Task',
-                completed: true
-            };
-    
-            renderEachTask(task);
+
+            const task = generateTasks(1, false, true);
+
+            const taskObject = objectsOfArray(task);
+
+            renderEachTask(taskObject);
 
             expect(taskList.children.length).toBe(1);
             expect(taskList.querySelector('.atask')).toBeTruthy();
-            expect(document.querySelector('.atask').style.opacity).toBe('0.6');
+            expect(taskList.querySelector('.atask').style.opacity).toBe('0.6');
         });
     
 
@@ -682,16 +730,19 @@ describe('Unit Tests', () => {
     //*
     describe('CreateTaskElement Function', () => {
 
+        beforeEach(() => {
+
+
+        })
+
         it('should create a task element with the correct structure', () => {
-           
-    
-            const task = {
-                id: 1,
-                text: 'Sample Task',
-                completed: false
-            };
-    
-            const taskElement = createTaskElement(task);
+
+            const tasks = generateTasks(1, true, false);
+            
+            const randomValue = tasks[0].text;
+            const taskObject = objectsOfArray(tasks);
+        
+            const taskElement = createTaskElement(taskObject);
     
             expect(taskElement).toBeTruthy();
             expect(taskElement.style.opacity).toBe('1');
@@ -701,7 +752,7 @@ describe('Unit Tests', () => {
 
             expect(taskElement.querySelector('.eachtask')).toBeTruthy();
             expect(taskElement.querySelector('input[type="text"]').id).toBe('onetask-1');
-            expect(taskElement.querySelector('#onetask-1').value).toBe('Sample Task');
+            expect(taskElement.querySelector('#onetask-1').value).toBe(randomValue);
             expect(taskElement.querySelector('#onetask-1').maxLength).toBe(150);
             expect(taskElement.querySelector('#onetask-1').getAttribute('readonly')).toBe('true');
 
@@ -711,14 +762,16 @@ describe('Unit Tests', () => {
             expect(taskElement.querySelector('#edit-1 button[title="Status"').id).toBe('checkbox-1');
             expect(taskElement.querySelector('#edit-1 #checkbox-1').disabled).toBeFalsy();
             
-            expect(taskElement.querySelector('#edit-1 button[title="Status"]').querySelector('img').src).toContain('img/notdone.png');
-            expect(taskElement.querySelector('#edit-1 button[title="Status"]').querySelector('img').alt).toBe('checkbox');
+            expect(taskElement.querySelector('#edit-1 #checkbox-1').querySelector('img').src).toContain('img/notdone.png');
+            expect(taskElement.querySelector('#edit-1 #checkbox-1').querySelector('img').alt).toBe('checkbox');
             
             expect(taskElement.querySelector('button[title="Edit Task"]').querySelector('img').src).toContain('img/edit.png');
             expect(taskElement.querySelector('button[title="Edit Task"]').querySelector('img').alt).toBe('edit icon');
+            expect(taskElement.querySelector('button[title="Edit Task"]').disabled).toBeFalsy();
 
             expect(taskElement.querySelector('button[title="Delete Task"]').querySelector('img').src).toContain('img/delete.png');
             expect(taskElement.querySelector('button[title="Delete Task"]').querySelector('img').alt).toBe('delete icon');
+            expect(taskElement.querySelector('button[title="Delete Task"]').disabled).toBeFalsy();
 
             expect(taskElement.querySelector('.savecancel')).toBeTruthy();
             expect(taskElement.querySelector('.savecancel').id).toBe('save-1');
@@ -732,10 +785,14 @@ describe('Unit Tests', () => {
             
             expect(taskElement.querySelector('button[title="Save Task"]').querySelector('img').src).toContain('img/save.png');
             expect(taskElement.querySelector('button[title="Save Task"]').querySelector('img').alt).toBe('save icon');
+            expect(taskElement.querySelector('button[title="Save Task"]').disabled).toBeFalsy();
+
 
             expect(taskElement.querySelector('button[title="Cancel Edit"]').querySelector('img').src).toContain('img/wrong.png');
             expect(taskElement.querySelector('button[title="Cancel Edit"]').querySelector('img').alt).toBe('cancel icon');
-    
+            expect(taskElement.querySelector('button[title="Cancel Edit"]').disabled).toBeFalsy();
+
+
             expect(taskElement.querySelector('button[title="Edit Task"]').disabled).toBeFalsy();
             expect(taskElement.querySelector('button[title="Delete Task"]').disabled).toBeFalsy();
             expect(taskElement.querySelector('button[title="Save Task"]').disabled).toBeFalsy();
@@ -744,15 +801,13 @@ describe('Unit Tests', () => {
         });
 
         it('should create a task element with the correct structure', () => {
-           
-    
-            const task = {
-                id: 2,
-                text: 'Sample Task',
-                completed: true
-            };
-    
-            const taskElement = createTaskElement(task);
+
+            const tasks = generateTasks([2], true, true);
+            
+            const randomValue = tasks[0].text;
+            const taskObject = objectsOfArray(tasks);
+        
+            const taskElement = createTaskElement(taskObject);
     
             expect(taskElement).toBeTruthy();
             expect(taskElement.style.opacity).toBe('0.6');
@@ -762,7 +817,7 @@ describe('Unit Tests', () => {
 
             expect(taskElement.querySelector('.eachtask')).toBeTruthy();
             expect(taskElement.querySelector('input[type="text"]').id).toBe('onetask-2');
-            expect(taskElement.querySelector('#onetask-2').value).toBe('Sample Task');
+            expect(taskElement.querySelector('#onetask-2').value).toBe(randomValue);
             expect(taskElement.querySelector('#onetask-2').maxLength).toBe(150);
             expect(taskElement.querySelector('#onetask-2').getAttribute('readonly')).toBe('true');
 
@@ -804,10 +859,6 @@ describe('Unit Tests', () => {
 
         });
     
-
-    
-        
-    
     });
 
     //*
@@ -835,7 +886,8 @@ describe('Unit Tests', () => {
         });
     
         it('should show task list and hide no tasks message when there are tasks', () => {
-            const tasks = [{ id: 1, text: 'Sample Task', completed: false }];
+
+            const tasks = generateTasks(1, false, false);
             toggleTaskListVisibility(tasks);
     
             expect(noTasks.style.display).toBe('none');
@@ -859,9 +911,9 @@ describe('Unit Tests', () => {
 
         it('should add a task and update localStorage', () => {
             
-            const tasksBefore = JSON.parse(localStorage.getItem('tasks'));
-            const taskIdCounterBefore = JSON.parse(localStorage.getItem('taskIdCounter'));
-            const statusFilterBefore= localStorage.getItem('statusFilter');
+            const tasksBefore = getLocalStorageItem('tasks');
+            const taskIdCounterBefore = getLocalStorageItem('taskIdCounter');
+            const statusFilterBefore= getLocalStorageItem('statusFilter');
 
             expect(tasksBefore).toBeNull;
             expect(taskIdCounterBefore).toBeNull;
@@ -874,9 +926,9 @@ describe('Unit Tests', () => {
             inputBox.value = text;
             addTask();
 
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            const taskIdCounter = JSON.parse(localStorage.getItem('taskIdCounter'));
-            const statusFilter= localStorage.getItem('statusFilter');
+            const tasks = getLocalStorageItem('tasks');
+            const taskIdCounter = getLocalStorageItem('taskIdCounter');
+            const statusFilter= getLocalStorageItem('statusFilter');
     
             expect(tasks).toHaveLength(1);
             expect(tasks[0].id).toBe(1);
@@ -899,27 +951,28 @@ describe('Unit Tests', () => {
 
         it('should add a task and update localStorage when a task already exists', () => {
 
-            const task = [
-                { id: 1, text: 'Task 1', completed: true }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(task));
-            localStorage.setItem('taskIdCounter', 1);
+            const existTask = generateTasks(1, true, true);
+            const randomValue1 = existTask[0].text;
+            
+            setLocalStorageItem('tasks', JSON.stringify(existTask));
+            setLocalStorageItem('taskIdCounter', 1);
+        
 
-
-            inputBox.value = 'Test Task';
+            let text = generateRandomString({ length: 10 });
+            inputBox.value = text;
             addTask();
 
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
-            const statusFilter= localStorage.getItem('statusFilter');
+            const tasks = getLocalStorageItem('tasks');
+            const statusFilter= getLocalStorageItem('statusFilter');
     
             expect(tasks).toHaveLength(2);
 
             expect(tasks[0].id).toBe(1);
-            expect(tasks[0].text).toBe('Task 1');
+            expect(tasks[0].text).toBe(randomValue1);
             expect(tasks[0].completed).toBe(true);
 
             
-            expect(tasks[1].text).toBe('Test Task');
+            expect(tasks[1].text).toBe(text);
             expect(tasks[1].completed).toBe(false);
 
             expect(statusFilter).toBe('all');
@@ -930,12 +983,12 @@ describe('Unit Tests', () => {
     
         it('should handle tasks with special characters correctly', () => {
 
-            localStorage.setItem('taskIdCounter', 1);
+            setLocalStorageItem('taskIdCounter', 1);
 
             inputBox.value = 'Task with @special #characters!';
             addTask();
     
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const tasks = getLocalStorageItem('tasks');
 
             expect(tasks).toHaveLength(1);
             expect(tasks[0].text).toBe('Task with @special #characters!');
@@ -949,7 +1002,7 @@ describe('Unit Tests', () => {
             inputBox.value = 'Duplicate Task'; 
             addTask(); 
     
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const tasks = getLocalStorageItem('tasks');
 
     
             expect(tasks).toHaveLength(1); 
@@ -970,7 +1023,7 @@ describe('Unit Tests', () => {
             inputBox.value = 'case insensitive task'; 
             addTask();
             
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const tasks = getLocalStorageItem('tasks');
 
             expect(tasks).toHaveLength(1);
 
@@ -983,7 +1036,7 @@ describe('Unit Tests', () => {
             inputBox.value = '';
             addTask();
     
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const tasks = getLocalStorageItem('tasks');
 
             expect(tasks).toBeNull();
 
@@ -1001,12 +1054,9 @@ describe('Unit Tests', () => {
     
             addTask();
     
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const tasks = getLocalStorageItem('tasks');
 
             expect(tasks).toBeNull();
-    
-            const notification = document.querySelector('.notification');
-
             notificationTest("Task cannot contain only spaces!",'rgb(184, 13, 13)');
             
         });
@@ -1020,7 +1070,6 @@ describe('Unit Tests', () => {
         it('should return false if input is empty', () => {
 
             const inputValue = '';
-
             const result = validateInput(inputValue);
     
             expect(result).toBe(false);
@@ -1033,8 +1082,7 @@ describe('Unit Tests', () => {
            
             const inputValue = '    ';
 
-            const result = validateInput(inputValue);
-    
+            const result = validateInput(inputValue);   
             expect(result).toBe(false);
 
             notificationTest("Task cannot contain only spaces!",'rgb(184, 13, 13)');
@@ -1046,10 +1094,9 @@ describe('Unit Tests', () => {
             const tasks = [
                 { id: 1, text: 'Task 1' }
               ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
 
             const inputValue = 'Task 1';
-    
             const result = validateInput(inputValue,-1);
     
             expect(result).toBe(false);
@@ -1063,7 +1110,7 @@ describe('Unit Tests', () => {
             const tasks = [
                 { id: 1, text: 'Task 1' }
               ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
 
             const inputValue = '   Task 1    ';
     
@@ -1078,7 +1125,7 @@ describe('Unit Tests', () => {
             const tasks = [
                 { id: 1, text: 'Task 1' }
               ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
 
             const inputValue = 'Task           1';
     
@@ -1106,7 +1153,7 @@ describe('Unit Tests', () => {
 
         it('should return false when there are no tasks', () => {
     
-            localStorage.setItem('tasks', JSON.stringify([]));
+            setLocalStorageItem('tasks', JSON.stringify([]));
     
             expect(isTaskAlreadyExists('New Task', -1)).toBeFalsy();
         });
@@ -1124,7 +1171,7 @@ describe('Unit Tests', () => {
               { id: 1, text: 'Task 1' },
               { id: 2, text: 'Task 2' }
             ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
             
             expect(isTaskAlreadyExists('New Task', -1)).toBeFalsy();
     
@@ -1136,7 +1183,7 @@ describe('Unit Tests', () => {
               { id: 1, text: 'Task 1' },
               { id: 2, text: 'Task 2' }
             ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
             
             expect(isTaskAlreadyExists('Task 1', -1)).toBeTruthy();
     
@@ -1148,7 +1195,7 @@ describe('Unit Tests', () => {
               { id: 1, text: 'tAsK 1' },
               { id: 2, text: 'Task 2' }
             ];
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
             
             expect(isTaskAlreadyExists('Task 1', -1)).toBeTruthy();
     
@@ -1161,7 +1208,7 @@ describe('Unit Tests', () => {
               { id: 2, text: 'Task 2' }
             ];
     
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
             
             expect(isTaskAlreadyExists('Task 1', 1)).toBeFalsy();
     
@@ -1174,7 +1221,7 @@ describe('Unit Tests', () => {
               { id: 2, text: 'Task 2' }
             ];
     
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            setLocalStorageItem('tasks', JSON.stringify(tasks));
             
             expect(isTaskAlreadyExists('Task 1', 2)).toBeTruthy();
     
@@ -1189,15 +1236,15 @@ describe('Unit Tests', () => {
 
     
         it('should change the completion status of a task and re-render tasks', () => {
+
             const taskId = 1;
-            const initialTasks = [
-                { id: taskId, text: 'Sample Task', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(initialTasks));
+        
+            const initialTask = generateTasks(1, true, false);
+            setLocalStorageItem('tasks', JSON.stringify(initialTask));
     
             checkBox(taskId);
     
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = getLocalStorageItem('tasks');
             const updatedTask = updatedTasks.find(task => task.id === taskId);
             expect(updatedTask.completed).toBe(true); 
 
@@ -1208,14 +1255,12 @@ describe('Unit Tests', () => {
 
         it('should change the completion status of a task and re-render tasks', () => {
             const taskId = 1;
-            const initialTasks = [
-                { id: taskId, text: 'Sample Task', completed: true }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(initialTasks));
+            const initialTask = generateTasks([taskId], true, true);
+            setLocalStorageItem('tasks', JSON.stringify(initialTask));
     
             checkBox(taskId);
     
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = getLocalStorageItem('tasks');
             const updatedTask = updatedTasks.find(task => task.id === taskId);
             expect(updatedTask.completed).toBe(false); 
 
@@ -1224,41 +1269,37 @@ describe('Unit Tests', () => {
             expect(document.querySelector('#save-1 button[title="Status"]').querySelector('img').src).toContain('img/notdone.png');
         });
         it('should toggle the completion status of a task and re-render tasks', () => {
+
             const taskId = 1;
-            const initialTasks = [
-                { id: taskId, text: 'Sample Task', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(initialTasks));
+            const initialTask = generateTasks([taskId], true, false);
+            setLocalStorageItem('tasks', JSON.stringify(initialTask));
     
             checkBox(taskId);
     
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = getLocalStorageItem('tasks');
             const updatedTask = updatedTasks.find(task => task.id === taskId);
             expect(updatedTask.completed).toBe(true); 
 
             checkBox(taskId);
     
-            const updatedTasks2 = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks2 = getLocalStorageItem('tasks');
             const updatedTask2 = updatedTasks2.find(task => task.id === taskId);
             expect(updatedTask2.completed).toBe(false); 
         
         });
     
         it('should toggle the completion status of the correct task when multiple tasks exist', () => {
+            
             const taskId = 2;
-            const initialTasks = [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: taskId, text: 'Task 2', completed: false },
-                { id: 3, text: 'Task 3', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(initialTasks));
+            const initialTask = generateTasks([1,taskId,3], true, false);
+            setLocalStorageItem('tasks', JSON.stringify(initialTask));
         
             checkBox(taskId);
         
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = getLocalStorageItem('tasks');
             const updatedTask = updatedTasks.find(task => task.id === taskId);
             const unUpdatedTask1 = updatedTasks.find(task => task.id === 1);
-            const unUpdatedTask3 = updatedTasks.find(task => task.id === 1);
+            const unUpdatedTask3 = updatedTasks.find(task => task.id === 3);
 
             expect(updatedTask.completed).toBe(true);
             expect(unUpdatedTask1.completed).toBe(false);
@@ -1279,23 +1320,23 @@ describe('Unit Tests', () => {
             confirmButton = document.getElementById('confirm-button');
             cancelButton = document.getElementById('cancel-button');
 
-            const sampleTasks = [
-                { id: '1', text: 'Task to Delete', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '2');
+            const initialTask = generateTasks(1, true, false);
+
+            setLocalStorageItem('tasks', JSON.stringify(initialTask));
+            setLocalStorageItem('taskIdCounter', '1');
 
             renderTasks();
 
         });
 
+
         it('should delete a task and update localStorage and UI on confirmation', () => {
     
-            deleteTask('1');
+            deleteTask(1);
 
             confirmButton.click();
     
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const tasks = getLocalStorageItem('tasks');
             expect(tasks).toBeNull;
 
             
@@ -1308,11 +1349,11 @@ describe('Unit Tests', () => {
     
         it('should cancel deletion and show cancellation message on cancel', () => {
     
-            deleteTask('1');
+            deleteTask(1);
 
             cancelButton.click();
     
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const tasks = getLocalStorageItem('tasks');
             expect(tasks).toHaveLength(1); 
 
             expect(document.querySelector('#listtask').children.length).toBe(1);
@@ -1324,25 +1365,23 @@ describe('Unit Tests', () => {
         });
     
         it('should delete a task correctly when there are multiple tasks', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Task 1', completed: false },
-                { id: '2', text: 'Task 2', completed: false },
-                { id: '3', text: 'Task 3', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '3');
+
+            const initialTask = generateTasks(3, true, false);
+       
+            setLocalStorageItem('tasks', JSON.stringify(initialTask));
+            setLocalStorageItem('taskIdCounter', '3');
     
             renderTasks();
     
-            deleteTask('2');
-   
+            deleteTask(2);
+
             confirmButton.click();
-    
-            const tasks = JSON.parse(localStorage.getItem('tasks'));
+
+            const tasks = getLocalStorageItem('tasks');
             expect(tasks).toHaveLength(2);
-            expect(tasks.some(task => task.id === '2')).toBeFalsy(); 
-            expect(tasks.some(task => task.id === '1')).toBeTruthy(); 
-            expect(tasks.some(task => task.id === '3')).toBeTruthy(); 
+            expect(tasks.some(task => task.id === 2)).toBeFalsy(); 
+            expect(tasks.some(task => task.id === 1)).toBeTruthy(); 
+            expect(tasks.some(task => task.id === 3)).toBeTruthy(); 
 
             expect(document.querySelector('#listtask').children.length).toBe(2);
             expect(document.querySelector('#onetask-1')).toBeTruthy(); 
@@ -1361,12 +1400,9 @@ describe('Unit Tests', () => {
 
         beforeEach(() => {
 
-            const sampleTasks = [
-                { id: 1, text: 'Task 1', completed: false }, 
-                { id: 2, text: 'Task 2', completed: true } 
-            ];
+            const initialTask = generateTasks(2, false, [false,true]);
             
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+            setLocalStorageItem('tasks', JSON.stringify(initialTask));
 
             renderTasks();
 
@@ -1378,7 +1414,7 @@ describe('Unit Tests', () => {
             const filters = ['all', 'inprogress', 'completed'];
 
             filters.forEach(filter => {
-                localStorage.setItem('statusFilter', filter);
+                setLocalStorageItem('statusFilter', filter);
                 clearTasks();
 
                 const message = document.querySelector('#message-text').textContent;
@@ -1399,7 +1435,7 @@ describe('Unit Tests', () => {
         
         it('should clear all tasks when filter is "all"', () => {
 
-            localStorage.setItem('statusFilter', 'all');
+            setLocalStorageItem('statusFilter', 'all');
             
             clearTasks();
 
@@ -1417,18 +1453,18 @@ describe('Unit Tests', () => {
 
         it('should clear only in-progress tasks when filter is "inprogress"', () => {
             
-            localStorage.setItem('statusFilter', 'inprogress');
+            setLocalStorageItem('statusFilter', 'inprogress');
             
             clearTasks();
 
             confirmButton.click();
 
-            const remainingTasks = JSON.parse(localStorage.getItem('tasks'));
+            const remainingTasks = getLocalStorageItem('tasks');
             expect(remainingTasks.length).toBe(1); 
             expect(remainingTasks[0].completed).toBe(true);
             expect(remainingTasks[0].text).toBe('Task 2');
 
-            localStorage.setItem('statusFilter', 'all');
+            setLocalStorageItem('statusFilter', 'all');
             renderTasks();
 
             expect(document.querySelector('#listtask').children.length).toBe(1);
@@ -1440,18 +1476,18 @@ describe('Unit Tests', () => {
 
         it('should clear only completed tasks when filter is "completed"', () => {
             
-            localStorage.setItem('statusFilter', 'completed');
+            setLocalStorageItem('statusFilter', 'completed');
 
             clearTasks();
 
             confirmButton.click();
 
-            const remainingTasks = JSON.parse(localStorage.getItem('tasks'));
+            const remainingTasks = getLocalStorageItem('tasks');
             expect(remainingTasks.length).toBe(1); 
             expect(remainingTasks[0].completed).toBe(false);
             expect(remainingTasks[0].text).toBe('Task 1');
 
-            localStorage.setItem('statusFilter', 'all');
+            setLocalStorageItem('statusFilter', 'all');
             renderTasks();
 
             expect(document.querySelector('#listtask').children.length).toBe(1);
@@ -1462,7 +1498,7 @@ describe('Unit Tests', () => {
 
         it('should cancel clear when cancel button is clicked', () => {
 
-            localStorage.setItem('statusFilter', 'all');
+            setLocalStorageItem('statusFilter', 'all');
             
             clearTasks();
 
@@ -1479,8 +1515,8 @@ describe('Unit Tests', () => {
 
         it('should handle case where there are no tasks to clear', () => {
             
-            localStorage.setItem('tasks', JSON.stringify([])); 
-            localStorage.setItem('statusFilter', 'all');
+            setLocalStorageItem('tasks', JSON.stringify([])); 
+            setLocalStorageItem('statusFilter', 'all');
             
             clearTasks();
 
@@ -1492,9 +1528,9 @@ describe('Unit Tests', () => {
         
         
         it('should reset taskIdCounter when clearing all tasks', () => {
-            localStorage.setItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }]));
-            localStorage.setItem('taskIdCounter', '5');
-            localStorage.setItem('statusFilter', 'all');
+            setLocalStorageItem('tasks', JSON.stringify([{ id: 1, text: 'Task 1', completed: false }]));
+            setLocalStorageItem('taskIdCounter', '5');
+            setLocalStorageItem('statusFilter', 'all');
             
             clearTasks();
 
@@ -1523,12 +1559,9 @@ describe('Unit Tests', () => {
             allEditButtons = document.querySelectorAll('.editdel button');
             radioButtons = document.querySelectorAll('input[name="taskFilter"]');
 
-
-            const sampleTasks = [
-                { id: '1', text: 'Editable Task', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
+            const sampleTasks = generateTasks(1, false, false);
+            setLocalStorageItem('tasks', JSON.stringify(sampleTasks));
+            setLocalStorageItem('taskIdCounter', '1');
     
             renderTasks();
 
@@ -1536,7 +1569,7 @@ describe('Unit Tests', () => {
 
         it('should enable editing mode for a task', () => {
     
-            toggleEdit('1');
+            toggleEdit(1);
 
             const taskInput = document.querySelector('#onetask-1');
             expect(taskInput).toBeTruthy();
@@ -1564,7 +1597,7 @@ describe('Unit Tests', () => {
     
         it('should restore input border style on input event', () => {
     
-            toggleEdit('1');
+            toggleEdit(1);
     
             const taskInput = document.querySelector('#onetask-1');
             taskInput.dispatchEvent(new Event('input'));
@@ -1588,11 +1621,9 @@ describe('Unit Tests', () => {
             allEditButtons = document.querySelectorAll('.editdel button');
             radioButtons = document.querySelectorAll('input[name="taskFilter"]');
 
-            const sampleTasks = [
-                { id: '1', text: 'Task Text 1', completed: false }
-            ];
+            const sampleTasks = generateTasks(1, false, false);
 
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
+            setLocalStorageItem('tasks', JSON.stringify(sampleTasks));
     
             renderTasks();
 
@@ -1638,7 +1669,7 @@ describe('Unit Tests', () => {
     //*
     describe('SaveTask Function', () => {
 
-        let confirmButton, cancelButton
+        let confirmButton, cancelButton,randomValue
 
         beforeEach(() => {
 
@@ -1646,11 +1677,11 @@ describe('Unit Tests', () => {
             cancelButton = document.getElementById('cancel-button');
             
 
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
+            const sampleTasks = generateTasks(1, true, false);
+            randomValue = sampleTasks[0].text;
+
+            setLocalStorageItem('tasks', JSON.stringify(sampleTasks));
+            setLocalStorageItem('taskIdCounter', '1');
     
             renderTasks();
 
@@ -1661,11 +1692,11 @@ describe('Unit Tests', () => {
     
             const taskInput = document.querySelector('#onetask-1');
             taskInput.value = 'Updated Task Text';
-            saveTask('1'); 
+            saveTask(1); 
     
             confirmButton.click();
     
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = getLocalStorageItem('tasks');
 
             expect(updatedTasks).toHaveLength(1);
             expect(updatedTasks[0].text).toBe('Updated Task Text');
@@ -1683,17 +1714,17 @@ describe('Unit Tests', () => {
     
             const taskInput = document.querySelector('#onetask-1');
             taskInput.value = 'Updated Task Text';
-            saveTask('1'); 
+            saveTask(1); 
     
             cancelButton.click();
     
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = getLocalStorageItem('tasks');
             expect(updatedTasks).toHaveLength(1);
-            expect(updatedTasks[0].text).toBe('Old Task Text');
-            expect(taskInput.value).toBe('Old Task Text'); 
+            expect(updatedTasks[0].text).toBe(randomValue);
+            expect(taskInput.value).toBe(randomValue); 
 
             expect(document.querySelector('#listtask').children.length).toBe(1);
-            expect(document.querySelector('#onetask-1').value).toBe('Old Task Text'); 
+            expect(document.querySelector('#onetask-1').value).toBe(randomValue); 
 
             notificationTest("Task saving canceled",'red');
 
@@ -1705,11 +1736,11 @@ describe('Unit Tests', () => {
             const taskInput = document.querySelector('#onetask-1');
 
             taskInput.value = '';
-            saveTask('1');
+            saveTask(1);
     
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = getLocalStorageItem('tasks');
             expect(updatedTasks).toHaveLength(1);
-            expect(updatedTasks[0].text).toBe('Old Task Text');
+            expect(updatedTasks[0].text).toBe(randomValue);
             expect(taskInput.value).toBe(''); 
 
             notificationTest("Task cannot be empty!!",'rgb(184, 13, 13)');
@@ -1720,11 +1751,11 @@ describe('Unit Tests', () => {
  
             const taskInput = document.querySelector('#onetask-1');
             taskInput.value = '     ';
-            saveTask('1'); 
+            saveTask(1); 
     
-            const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = getLocalStorageItem('tasks');
             expect(updatedTasks).toHaveLength(1);
-            expect(updatedTasks[0].text).toBe('Old Task Text');
+            expect(updatedTasks[0].text).toBe(randomValue);
 
             notificationTest("Task cannot contain only spaces!",'rgb(184, 13, 13)');
     
@@ -1732,28 +1763,36 @@ describe('Unit Tests', () => {
     
         test('should not allow saving a task with text that already exists', () => {
      
-            const sampleTasks = [
-                { id: 1, text: 'Existing Task', completed: false },
-                { id: 2, text: 'Another Task', completed: false }
-            ];
+            const sampleTasks = generateTasks(2, true, false);
+            const randomValue1 = sampleTasks[0].text;
+            const randomValue2 = sampleTasks[1].text;
             
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
+            setLocalStorageItem('tasks', JSON.stringify(sampleTasks));
+            setLocalStorageItem('taskIdCounter', '1');
     
             renderTasks();
 
-            const taskInput = document.querySelector('#onetask-1');
-            taskInput.value = 'Another Task';
-            saveTask('1'); 
-    
+            const taskInput1 = document.querySelector('#onetask-1');
+            taskInput1.value = randomValue2;
+            saveTask(1); 
+
             confirmButton.click();
 
             notificationTest("Task already exists!",'rgb(184, 13, 13)');
     
-            expect(localStorage.getItem('tasks')).toBe(JSON.stringify([
-                { id: 1, text: 'Existing Task', completed: false },
-                { id: 2, text: 'Another Task', completed: false }
-            ]));
+            expect(getLocalStorageItem('tasks')).toEqual(sampleTasks);
+
+            const taskInput2 = document.querySelector('#onetask-2');
+            taskInput2.value = randomValue1;
+            saveTask(2); 
+
+            confirmButton.click();
+
+            notificationTest("Task already exists!",'rgb(184, 13, 13)');
+    
+            expect(getLocalStorageItem('tasks')).toEqual(sampleTasks);
+
+
     
         });
     
@@ -1764,14 +1803,15 @@ describe('Unit Tests', () => {
     //*
     describe('CancelEdit Function', () => {
 
+        let randomValue;
+
         beforeEach(() => {
 
-            const sampleTasks = [
-                { id: '1', text: 'Task 1', completed: false },
-                { id: '2', text: 'Task 2', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '2');
+            
+            const sampleTasks = generateTasks(2, true, false);
+            randomValue = sampleTasks[0].text
+            setLocalStorageItem('tasks', JSON.stringify(sampleTasks));
+            setLocalStorageItem('taskIdCounter', '2');
     
             renderTasks();
 
@@ -1782,9 +1822,9 @@ describe('Unit Tests', () => {
             const taskInput = document.querySelector('#onetask-1');
             taskInput.value = 'Updated Task Text';
     
-            cancelEdit('1'); 
+            cancelEdit(1); 
             
-            expect(taskInput.value).toBe('Task 1');
+            expect(taskInput.value).toBe(randomValue);
             expect(document.querySelector('#save-1').style.display).toBe('none');
             expect(document.querySelector('#edit-1').style.display).toBe('flex'); 
         });
@@ -1797,9 +1837,9 @@ describe('Unit Tests', () => {
             taskInput1.value = 'Updated Task 1 Text';
             taskInput2.value = 'Updated Task 2 Text';
     
-            cancelEdit('1'); 
+            cancelEdit(1); 
             
-            expect(taskInput1.value).toBe('Task 1'); 
+            expect(taskInput1.value).toBe(randomValue); 
             expect(taskInput2.value).toBe('Updated Task 2 Text'); 
         });
     
@@ -1821,11 +1861,11 @@ describe('Unit Tests', () => {
         });
 
         it('toggleSave sets task text to readonly and border style to none', () => {
-            const sampleTasks = [
-                { id: '1', text: 'Old Task Text', completed: false }
-            ];
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-            localStorage.setItem('taskIdCounter', '1');
+
+            const sampleTasks = generateTasks(1, true, false);
+
+            setLocalStorageItem('tasks', JSON.stringify(sampleTasks));
+            setLocalStorageItem('taskIdCounter', '1');
         
             renderTasks();
         
@@ -1865,13 +1905,8 @@ describe('Unit Tests', () => {
 
         beforeEach(() => {
 
-            const sampleTasks = [
-                { id: '1', text: 'Task Text 1', completed: false },
-                { id: '2', text: 'Task Text 2', completed: false }
-            ];
-
-            localStorage.setItem('tasks', JSON.stringify(sampleTasks));
-    
+            const sampleTasks = generateTasks(2, true, false);
+            setLocalStorageItem('tasks', JSON.stringify(sampleTasks));
             renderTasks();
 
         });
@@ -1879,7 +1914,7 @@ describe('Unit Tests', () => {
 
         it('should hide the edit div and show the save div', () => {
 
-            toggleTaskControls('1', 'edit', 'save');
+            toggleTaskControls(1, 'edit', 'save');
 
             const fromDiv = document.querySelector('#edit-1');
             const toDiv = document.querySelector('#save-1');
@@ -1892,7 +1927,7 @@ describe('Unit Tests', () => {
     
         it('should hide the save div and show the edit div', () => {
             
-            toggleTaskControls('1', 'save', 'edit');
+            toggleTaskControls(1, 'save', 'edit');
     
             const fromDiv = document.querySelector('#save-1');
             const toDiv = document.querySelector('#edit-1');
@@ -1908,7 +1943,7 @@ describe('Unit Tests', () => {
             const toDiv = document.querySelector('#save-1');
             toDiv.style.display = 'none';
         
-            toggleTaskControls('1', 'edit', 'save');
+            toggleTaskControls(1, 'edit', 'save');
         
             expect(fromDiv.style.display).toBe('none');
             expect(toDiv.style.display).toBe('flex');
@@ -1922,7 +1957,7 @@ describe('Unit Tests', () => {
             const toDiv = document.querySelector('#save-1');
             toDiv.style.display = 'flex';
         
-            toggleTaskControls('1', 'edit', 'save');
+            toggleTaskControls(1, 'edit', 'save');
         
             expect(fromDiv.style.display).toBe('none');
             expect(toDiv.style.display).toBe('flex');
@@ -1930,9 +1965,9 @@ describe('Unit Tests', () => {
 
         it('should hide the edit element and show the save element of multiple tasks', () => {
 
-            toggleTaskControls('1', 'edit', 'save');
-            toggleTaskControls('1', 'save', 'edit');
-            toggleTaskControls('2', 'edit', 'save');
+            toggleTaskControls(1, 'edit', 'save');
+            toggleTaskControls(1, 'save', 'edit');
+            toggleTaskControls(2, 'edit', 'save');
             
 
             const fromDiv = document.querySelector('#edit-1');
@@ -2210,7 +2245,7 @@ describe('Adding a Task', () => {
         inputBox.value = 'New Task';
         fireEvent.submit(form);
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const filter = localStorage.getItem('statusFilter');
         const taskIdCounter =localStorage.getItem('taskIdCounter');
 
@@ -2255,7 +2290,7 @@ describe('Adding a Task', () => {
         inputBox.value = 'Task 2';
         form.dispatchEvent(new Event('submit'));
 
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const filter = localStorage.getItem('statusFilter');
         const taskIdCounter =localStorage.getItem('taskIdCounter');
 
@@ -2303,7 +2338,7 @@ describe('Adding a Task', () => {
         inputBox.value = '    Task     ';
         form.dispatchEvent(new  Event('submit'));
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         expect(tasks).toHaveLength(1);
         expect(tasks[0].text).toBe('Task');
     });
@@ -2315,7 +2350,7 @@ describe('Adding a Task', () => {
         inputBox.value = '';
         form.dispatchEvent(new Event('submit'));
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         expect(tasks).toBeNull();
 
         notificationTest("Task cannot be empty!!",'rgb(184, 13, 13)');
@@ -2333,7 +2368,7 @@ describe('Adding a Task', () => {
         inputBox.value = '     ';
         form.dispatchEvent(new Event('submit'));
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         expect(tasks).toBeNull();
 
         notificationTest("Task cannot contain only spaces!",'rgb(184, 13, 13)');
@@ -2353,7 +2388,7 @@ describe('Adding a Task', () => {
         inputBox.value = 'Task 1';
         form.dispatchEvent(new Event('submit'));
 
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         expect(tasks).toHaveLength(1);
         
         notificationTest("Task already exists!",'rgb(184, 13, 13)');
@@ -2385,9 +2420,9 @@ describe('filter a Task', () => {
         inputBox.value = 'Task 3';
         form.dispatchEvent(new  Event('submit'));
         
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         tasks[1].completed = true;
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+        setLocalStorageItem('tasks', JSON.stringify(tasks));
     
         const inProgressFilter = document.querySelector('input[name="taskFilter"][value="inprogress"]');
         inProgressFilter.click();
@@ -2417,7 +2452,7 @@ describe('Deleting a Task', () => {
         inputBox.value = 'Task to be deleted';
         addButton.click();
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
     
         const deleteButton = document.querySelector(`#edit-${taskId} button[title="Delete Task"]`);
@@ -2427,7 +2462,7 @@ describe('Deleting a Task', () => {
         const confirmButton = document.getElementById('confirm-button');
         confirmButton.click();
     
-        const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+        const updatedTasks = getLocalStorageItem('tasks');
         expect(updatedTasks).toHaveLength(0);
     });
 
@@ -2438,7 +2473,7 @@ describe('Deleting a Task', () => {
         inputBox.value = 'Task to be deleted';
         addButton.click();
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
     
         const deleteButton = document.querySelector(`#edit-${taskId} button[title="Delete Task"]`);
@@ -2448,7 +2483,7 @@ describe('Deleting a Task', () => {
         const cancelButton = document.getElementById('cancel-button');
         cancelButton.click();
     
-        const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+        const updatedTasks = getLocalStorageItem('tasks');
         expect(updatedTasks).toHaveLength(1);
         expect(updatedTasks[0].text).toBe('Task to be deleted');
     });
@@ -2471,7 +2506,7 @@ describe('Editing a Task', () => {
         inputBox.value = 'Task to be edited';
         addButton.click();
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
 
         const aTask = document.querySelector(`#onetask-1`)
@@ -2495,7 +2530,7 @@ describe('Editing a Task', () => {
         confirmButton.click();
         
     
-        const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+        const updatedTasks = getLocalStorageItem('tasks');
         expect(updatedTasks[0].text).toBe('Task edited');
 
         expect(taskList.textContent).not.toBeNull();
@@ -2513,7 +2548,7 @@ describe('Editing a Task', () => {
         inputBox.value = 'Task to be edited';
         addButton.click();
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
     
         const editButton = document.querySelector(`#edit-${taskId} button[title="Edit Task"]`);
@@ -2528,7 +2563,7 @@ describe('Editing a Task', () => {
         const cancelButton = document.getElementById('cancel-button');
         cancelButton.click();
     
-        const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+        const updatedTasks = getLocalStorageItem('tasks');
         expect(updatedTasks[0].text).toBe('Task to be edited');
 
         const aTask = document.querySelector(`#onetask-1`);
@@ -2547,7 +2582,7 @@ describe('Editing a Task', () => {
         inputBox.value = 'Task to be edited';
         addButton.click();
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
     
         const editButton = document.querySelector(`#edit-${taskId} button[title="Edit Task"]`);
@@ -2562,7 +2597,7 @@ describe('Editing a Task', () => {
         const notification = document.querySelector('.notification');
         expect(notification.textContent).toBe('Task cannot be empty!!');
     
-        const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+        const updatedTasks = getLocalStorageItem('tasks');
         expect(updatedTasks[0].text).toBe('Task to be edited');
 
         const aTask = document.querySelector(`#onetask-1`)
@@ -2584,7 +2619,7 @@ describe('Editing a Task', () => {
         inputBox.value = 'Task to be edited';
         addButton.click();
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[1].id;
     
         const editButton = document.querySelector(`#edit-${taskId} button[title="Edit Task"]`);
@@ -2599,7 +2634,7 @@ describe('Editing a Task', () => {
         const notification = document.querySelector('.notification');
         expect(notification.textContent).toBe('Task already exists!');
     
-        const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+        const updatedTasks = getLocalStorageItem('tasks');
         expect(updatedTasks[0].text).toBe('Existing Task');
 
         const aTask = document.querySelector(`#onetask-1`)
@@ -2619,7 +2654,7 @@ describe('Editing a Task', () => {
         inputBox.value = 'Task 1';
         form.dispatchEvent(new Event('submit'));
         
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
 
         const checkButton = document.querySelector(`#checkbox-${taskId}`);
@@ -2656,7 +2691,7 @@ describe('Cancel editing of Task', () => {
         inputBox.value = 'Task to be edited';
         addButton.click();
     
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
     
         const editButton = document.querySelector(`#edit-${taskId} button[title="Edit Task"]`);
@@ -2668,7 +2703,7 @@ describe('Cancel editing of Task', () => {
         const cancelButton = document.querySelector(`#save-${taskId} button[title="Cancel Edit"]`);
         cancelButton.click();
     
-        const updatedTasks = JSON.parse(localStorage.getItem('tasks'));
+        const updatedTasks = getLocalStorageItem('tasks');
         expect(updatedTasks[0].text).toBe('Task to be edited');
 
         const aTask = document.querySelector(`#onetask-1`)
@@ -2692,7 +2727,7 @@ describe('Change completed status', () => {
         inputBox.value = 'Task 1';
         form.dispatchEvent(new Event('submit'));
 
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         expect(tasks[0].completed).toBeFalsy();
         
         const taskId = tasks[0].id;
@@ -2700,7 +2735,7 @@ describe('Change completed status', () => {
         const checkButton = document.querySelector(`#checkbox-${taskId}`);
         checkButton.click()
 
-        const tasksComplete = JSON.parse(localStorage.getItem('tasks'));
+        const tasksComplete = getLocalStorageItem('tasks');
         expect(tasksComplete[0].completed).toBeTruthy();  
     });
 
@@ -2711,14 +2746,14 @@ describe('Change completed status', () => {
         inputBox.value = 'Task 1';
         form.dispatchEvent(new Event('submit'));
 
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
 
         const checkButton = document.querySelector(`#checkbox-${taskId}`);
         checkButton.click()
         checkButton.click()
 
-        const tasksComplete = JSON.parse(localStorage.getItem('tasks'));
+        const tasksComplete = getLocalStorageItem('tasks');
         expect(tasksComplete[0].completed).toBeFalsy();  
     });
 
@@ -2741,7 +2776,7 @@ describe('Clear tasks', () => {
         const confirmButton = document.getElementById('confirm-button');
         confirmButton.click();
 
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         expect(tasks).toBeNull();
         expect(taskList.textContent).toBe('');
         
@@ -2763,7 +2798,7 @@ describe('Clear tasks', () => {
         const cancelButton = document.getElementById('cancel-button');
         cancelButton.click();
 
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         expect(tasks[0].text).toBe('Task 1');
 
         const aTask = document.querySelector(`#onetask-1`)
@@ -2788,7 +2823,7 @@ describe('Clear tasks', () => {
         inputBox.value = 'Task 2';
         form.dispatchEvent(new Event('submit'));
 
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
 
         const checkButton = document.querySelector(`#checkbox-${taskId}`);
@@ -2803,7 +2838,7 @@ describe('Clear tasks', () => {
         const confirmButton = document.getElementById('confirm-button');
         confirmButton.click();
 
-        const tasksclear = JSON.parse(localStorage.getItem('tasks'));
+        const tasksclear = getLocalStorageItem('tasks');
         expect(tasksclear).toHaveLength(1);
         expect(tasksclear[0].text).toBe('Task 1')
 
@@ -2826,7 +2861,7 @@ describe('Clear tasks', () => {
         inputBox.value = 'Task 2';
         form.dispatchEvent(new Event('submit'));
 
-        const tasks = JSON.parse(localStorage.getItem('tasks'));
+        const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
 
         const checkButton = document.querySelector(`#checkbox-${taskId}`);
@@ -2841,7 +2876,7 @@ describe('Clear tasks', () => {
         const confirmButton = document.getElementById('confirm-button');
         confirmButton.click();
 
-        const tasksclear = JSON.parse(localStorage.getItem('tasks'));
+        const tasksclear = getLocalStorageItem('tasks');
         expect(tasksclear).toHaveLength(1);
         expect(tasksclear[0].text).toBe('Task 2')
         
@@ -2853,66 +2888,6 @@ describe('Clear tasks', () => {
 
 });
 
-describe('Components', () => {
 
-    let addButton;
-
-
-    beforeEach(() => {
-
-        const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
-        const cssContent = fs.readFileSync(path.resolve(__dirname, './css/style.css'), 'utf8');
-
-        document.body.innerHTML = html;
-
-        const styleElement = document.createElement('style');
-        styleElement.textContent = cssContent;
-        document.head.appendChild(styleElement);
-
-        ({
-            renderTasks,
-            renderEachTask,
-            addTask,
-            validateInput,
-            checkBox,
-            clearTasks,
-            cancelEdit,
-            isTaskAlreadyExists,
-            filterTasks,
-            deleteTask,
-            saveTask,
-            toggleEdit,
-            toggleSave,
-            showNotification,
-            showToast,
-            clearTaskList,
-            createTaskElement,
-            displayTaskCounts,
-            toggleTaskListVisibility,
-            disableOtherElements,
-            toggleTaskControls,
-            toggleToast
-            } = require('./script.js'));
-
-        addButton = document.querySelector('#add');
-
-
-        jest.resetModules();
-
-    });
-
-
-    it('buttons should be clickable', () => {
-
-        const addTask = jest.fn();
-        
-
-        addButton.click();
-
-        expect(addTask).toHaveBeenCalledTimes(1);
-
-    });
-
-});
 
 
