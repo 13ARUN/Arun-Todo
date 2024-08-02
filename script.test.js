@@ -23,6 +23,7 @@ function notificationTest (text, color){
     const style = window.getComputedStyle(notification);
     expect(style.backgroundColor).toBe(color);
     expect(style.visibility).toBe('visible');
+
     
 }
 
@@ -50,7 +51,6 @@ function generateTasks(param, randomText = true, statuses = false) {
     return tasks;
 }
 
-
 function objectsOfArray(taskArray) {
     return Object.assign({}, ...taskArray);
 }
@@ -75,6 +75,8 @@ const getLocalStorageItem = (key) => {
 const clearLocalStorage = () => {
     localStorage.clear();
 };
+
+//* Test Cases
 
 describe('HTML', () => {
 
@@ -1311,13 +1313,14 @@ describe('Unit Tests', () => {
 
 
     //* 
-    describe('Delete Function', () => {
+    describe('Delete Task Function', () => {
 
         let confirmButton, cancelButton
 
         beforeEach(() => {
 
             confirmButton = document.getElementById('confirm-button');
+            
             cancelButton = document.getElementById('cancel-button');
 
             const initialTask = generateTasks(1, true, false);
@@ -1441,7 +1444,7 @@ describe('Unit Tests', () => {
 
             confirmButton.click();
             
-            expect(localStorage.getItem('tasks')).toBe(null); 
+            expect(getLocalStorageItem('tasks')).toBe(null); 
 
             expect(document.querySelector('#listtask').children.length).toBe(0);
             expect(document.querySelector('#onetask-1')).toBeNull();
@@ -1504,7 +1507,7 @@ describe('Unit Tests', () => {
 
             cancelButton.click();
             
-            expect(localStorage.getItem('tasks')).not.toBe(null);
+            expect(getLocalStorageItem('tasks')).not.toBe(null);
 
             expect(document.querySelector('#listtask').children.length).toBe(2);
             expect(document.querySelector('#onetask-1').value).toBe('Task 1');
@@ -1522,7 +1525,7 @@ describe('Unit Tests', () => {
 
             confirmButton.click();
 
-            expect(localStorage.getItem('tasks')).toBeNull();
+            expect(getLocalStorageItem('tasks')).toBeNull();
         });
 
         
@@ -1536,8 +1539,8 @@ describe('Unit Tests', () => {
 
             confirmButton.click();
 
-            expect(localStorage.getItem('taskIdCounter')).toBeNull(); 
-            expect(localStorage.getItem('tasks')).toBeNull(); 
+            expect(getLocalStorageItem('taskIdCounter')).toBeNull(); 
+            expect(getLocalStorageItem('tasks')).toBeNull(); 
         });
 
     });
@@ -1691,7 +1694,8 @@ describe('Unit Tests', () => {
             
     
             const taskInput = document.querySelector('#onetask-1');
-            taskInput.value = 'Updated Task Text';
+            const toEdit = generateRandomString({ length: 10 })
+            taskInput.value = toEdit;
             saveTask(1); 
     
             confirmButton.click();
@@ -1699,11 +1703,11 @@ describe('Unit Tests', () => {
             const updatedTasks = getLocalStorageItem('tasks');
 
             expect(updatedTasks).toHaveLength(1);
-            expect(updatedTasks[0].text).toBe('Updated Task Text');
-            expect(taskInput.value).toBe('Updated Task Text'); 
+            expect(updatedTasks[0].text).toBe(toEdit);
+            expect(taskInput.value).toBe(toEdit); 
 
             expect(document.querySelector('#listtask').children.length).toBe(1);
-            expect(document.querySelector('#onetask-1').value).toBe('Updated Task Text'); 
+            expect(document.querySelector('#onetask-1').value).toBe(toEdit); 
 
             notificationTest("Task updated successfully!",'green');
 
@@ -1713,7 +1717,8 @@ describe('Unit Tests', () => {
             
     
             const taskInput = document.querySelector('#onetask-1');
-            taskInput.value = 'Updated Task Text';
+            const toEdit = generateRandomString({ length: 10 })
+            taskInput.value = randomValue;
             saveTask(1); 
     
             cancelButton.click();
@@ -2246,12 +2251,12 @@ describe('Adding a Task', () => {
         fireEvent.submit(form);
     
         const tasks = getLocalStorageItem('tasks');
-        const filter = localStorage.getItem('statusFilter');
-        const taskIdCounter =localStorage.getItem('taskIdCounter');
+        const filter = getLocalStorageItem('statusFilter');
+        const taskIdCounter =getLocalStorageItem('taskIdCounter');
 
         expect(tasks).toHaveLength(1);
         expect(filter).toBe('all');
-        expect(taskIdCounter).toBe('1');
+        expect(taskIdCounter).toBe(1);
 
         expect(tasks[0].id).toBe(1);
         expect(tasks[0].text).toBe('New Task');
@@ -2291,12 +2296,12 @@ describe('Adding a Task', () => {
         form.dispatchEvent(new Event('submit'));
 
         const tasks = getLocalStorageItem('tasks');
-        const filter = localStorage.getItem('statusFilter');
-        const taskIdCounter =localStorage.getItem('taskIdCounter');
+        const filter = getLocalStorageItem('statusFilter');
+        const taskIdCounter =getLocalStorageItem('taskIdCounter');
 
         expect(tasks).toHaveLength(2);
         expect(filter).toBe('all');
-        expect(taskIdCounter).toBe('2');
+        expect(taskIdCounter).toBe(2);
 
         expect(tasks[0].id).toBe(1);
         expect(tasks[0].text).toBe('Task 1');
