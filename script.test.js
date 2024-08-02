@@ -80,6 +80,16 @@ const clearLocalStorage = () => {
 
 describe('HTML', () => {
 
+function checkElementAttributes(selector, attributes) {
+    const element = document.querySelector(selector);
+    expect(element).toBeTruthy();
+    Object.keys(attributes).forEach(attr => {
+        expect(element.getAttribute(attr)).toBe(attributes[attr]);
+    });
+    return element;
+}
+    
+
 
 
 beforeEach(() => {
@@ -172,35 +182,59 @@ describe('HTML-Task Input Section', () => {
 
         taskFieldDiv = document.querySelector('.taskfield');
         taskInputDiv = document.querySelector('.taskinput');
-        form = taskInputDiv.querySelector('form');
-        inputField = form.querySelector('#input');
-        addBtn= form.querySelector('#add');
-        addBtnImg = addBtn.querySelector('img');
 
+
+    });
+
+    it('should have all elements in task input Div', () => {
+
+
+        expect(taskFieldDiv).toBeTruthy();
+        expect(taskInputDiv).toBeTruthy();
+        const form = document.querySelector('.taskinput form');
+        expect(form).toBeTruthy();
+
+        checkElementAttributes('#input', {
+            type: 'text',
+            id: 'input',
+            placeholder: 'Enter your tasks...',
+            autocomplete: 'off',
+            maxLength: '150'
+        });
+
+        checkElementAttributes('#add', {
+            type: 'submit',
+            id: 'add',
+            title: 'Add'
+        });
+
+        checkElementAttributes('#add img', {
+            alt: 'add icon'
+
+        });
     });
 
     
-    it('should have all elements in task input Div', () => {
+    // it('should have all elements in task input Div', () => {
         
-        expect(taskFieldDiv).toBeTruthy();
-        expect(taskInputDiv).toBeTruthy();
-        expect(taskInputDiv.contains(form)).toBe(true);
-        expect(form.contains(inputField) && form.contains(addBtn)).toBe(true);
-        expect(inputField.type).toBe('text');
-        expect(inputField.id).toBe('input');
-        expect(inputField.placeholder).toBe('Enter your tasks...');   
-        expect(inputField.autocomplete).toBe('off');  
-        expect(inputField.maxLength).toBe(150); 
-        expect(inputField.textContent).toBe('');
-        expect(addBtn.type).toBe('submit');
-        expect(addBtn.id).toBe('add');
-        expect(addBtn.title).toBe('Add');
-        expect(addBtn.disabled).toBe(false);
-        expect(addBtn.contains(addBtnImg)).toBe(true);
-        expect(addBtnImg.src).toContain('img/taskadd.png');
-        expect(addBtnImg.alt).toBe('add icon'); 
 
-    });
+    //     expect(taskInputDiv.contains(form)).toBe(true);
+    //     expect(form.contains(inputField) && form.contains(addBtn)).toBe(true);
+    //     expect(inputField.type).toBe('text');
+    //     expect(inputField.id).toBe('input');
+    //     expect(inputField.placeholder).toBe('Enter your tasks...');   
+    //     expect(inputField.autocomplete).toBe('off');  
+    //     expect(inputField.maxLength).toBe(150); 
+    //     expect(inputField.textContent).toBe('');
+    //     expect(addBtn.type).toBe('submit');
+    //     expect(addBtn.id).toBe('add');
+    //     expect(addBtn.title).toBe('Add');
+    //     expect(addBtn.disabled).toBe(false);
+    //     expect(addBtn.contains(addBtnImg)).toBe(true);
+    //     expect(addBtnImg.src).toContain('img/taskadd.png');
+    //     expect(addBtnImg.alt).toBe('add icon'); 
+
+    // });
 
 });
 
@@ -380,7 +414,7 @@ describe('HTML-Script Section', () => {
 
 });
 
-describe.only('Unit Tests', () => {
+describe('Unit Tests', () => {
 
     beforeEach(() => {
 
