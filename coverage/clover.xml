@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1722838293926" clover="3.2.0">
-  <project timestamp="1722838293926" name="All files">
+<coverage generated="1722841293075" clover="3.2.0">
+  <project timestamp="1722841293075" name="All files">
     <metrics statements="228" coveredstatements="228" conditionals="64" coveredconditionals="64" methods="58" coveredmethods="58" elements="350" coveredelements="350" complexity="0" loc="228" ncloc="228" packages="1" files="1" classes="1"/>
     <file name="script.js" path="C:\Users\HP\Desktop\ExportTodo\script.js">
       <metrics statements="228" coveredstatements="228" conditionals="64" coveredconditionals="64" methods="58" coveredmethods="58"/>

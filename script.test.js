@@ -410,7 +410,7 @@ describe('Unit Tests', () => {
     });
 
 
-    // TODO
+    //*
     describe('RenderTasks', () => {
     
         it('should render tasks from localStorage', () => {
@@ -467,10 +467,8 @@ describe('Unit Tests', () => {
     
         it('should handle an empty task list', () => {
 
-            taskList.innerHTML = '';
-    
+            taskList.innerHTML = ''
             clearTaskList();
-    
             expect(taskList.innerHTML).toBe('');
         });
     
@@ -612,7 +610,7 @@ describe('Unit Tests', () => {
             taskList = document.querySelector('#listtask');
         });
     
-        test('should create and append a task element with correct content', () => {
+        it('should create and append a task element with correct content', () => {
             
             const task = generateTasks(1, false, false);
 
@@ -626,7 +624,7 @@ describe('Unit Tests', () => {
             expect(taskList.querySelector('.atask').style.opacity).toBe('1');
         });
 
-        test('should create and append a task element with correct content', () => {
+        it('should create and append a task element with correct content', () => {
             
 
             const task = generateTasks(1, false, true);
@@ -816,7 +814,7 @@ describe('Unit Tests', () => {
     });
 
 
-    // TODO render
+    //*
     describe('AddTask Function', () => {
 
         beforeEach(() => {
@@ -1681,7 +1679,7 @@ describe('Unit Tests', () => {
     
         });
     
-        test('should not allow saving a task with text that already exists', () => {
+        it('should not allow saving a task with text that already exists', () => {
      
             const sampleTasks = generateTasks(2, true, false);
             const randomValue1 = sampleTasks[0].text;
@@ -2111,6 +2109,10 @@ describe('Integration Tests', () => {
 
     let form,addButton,taskList,countText,inputBox;
 
+    const addTask = (taskText) => {
+        inputBox.value = taskText;
+        fireEvent.submit(form);
+    };
 
     beforeEach(() => {
 
@@ -2162,8 +2164,7 @@ describe('Adding a Task', () => {
         expect(inputBox.value).toBe('');
         expect(taskList.textContent).toBe('');
 
-        inputBox.value = 'New Task';
-        fireEvent.submit(form);
+        addTask('New Task');
     
         const tasks = getLocalStorageItem('tasks');
         const filter = getLocalStorageItem('statusFilter');
@@ -2202,13 +2203,10 @@ describe('Adding a Task', () => {
 
         expect(inputBox.value).toBe('');
         expect(taskList.textContent).toBe('');
-        
-    
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
 
-        inputBox.value = 'Task 2';
-        form.dispatchEvent(new Event('submit'));
+        addTask('Task 1');
+
+        addTask('Task 2');
 
         const tasks = getLocalStorageItem('tasks');
         const filter = getLocalStorageItem('statusFilter');
@@ -2252,11 +2250,8 @@ describe('Adding a Task', () => {
 
 
     it('should add a new task with leading and trailing spaces after trimming', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
     
-        inputBox.value = '    Task     ';
-        form.dispatchEvent(new  Event('submit'));
+        addTask('    Task     ');
     
         const tasks = getLocalStorageItem('tasks');
         expect(tasks).toHaveLength(1);
@@ -2264,11 +2259,8 @@ describe('Adding a Task', () => {
     });
 
     it('should not add an empty task', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-    
-        inputBox.value = '';
-        form.dispatchEvent(new Event('submit'));
+
+        addTask('');
     
         const tasks = getLocalStorageItem('tasks');
         expect(tasks).toBeNull();
@@ -2282,11 +2274,8 @@ describe('Adding a Task', () => {
     });
 
     it('should not add a task with only spaces', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
     
-        inputBox.value = '     ';
-        form.dispatchEvent(new Event('submit'));
+        addTask('   ');
     
         const tasks = getLocalStorageItem('tasks');
         expect(tasks).toBeNull();
@@ -2299,14 +2288,10 @@ describe('Adding a Task', () => {
     });
 
     it('should not add an existing task', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-        
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
-        
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
+
+        addTask('Task 1');
+
+        addTask('Task 1');
 
         const tasks = getLocalStorageItem('tasks');
         expect(tasks).toHaveLength(1);
@@ -2328,18 +2313,13 @@ describe('filter a Task', () => {
 
 
     it('should filter tasks based on status', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-        
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new  Event('submit'));
-        
-        inputBox.value = 'Task 2';
-        form.dispatchEvent(new  Event('submit'));
 
-        inputBox.value = 'Task 3';
-        form.dispatchEvent(new  Event('submit'));
+        addTask('Task 1');
+
+        addTask('Task 2');
         
+        addTask('Task 3');
+
         const tasks = getLocalStorageItem('tasks');
         tasks[1].completed = true;
         setLocalStorageItem('tasks', JSON.stringify(tasks));
@@ -2366,18 +2346,14 @@ describe('filter a Task', () => {
 describe('Deleting a Task', () => {
 
     it('should delete a task after adding a task', () => {
-        const inputBox = document.querySelector('#input');
-        const addButton = document.querySelector('#add');
-    
-        inputBox.value = 'Task to be deleted';
-        addButton.click();
+
+        addTask('Task to be deleted');
     
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
     
         const deleteButton = document.querySelector(`#edit-${taskId} button[title="Delete Task"]`);
         deleteButton.click();
-    
     
         const confirmButton = document.getElementById('confirm-button');
         confirmButton.click();
@@ -2387,11 +2363,8 @@ describe('Deleting a Task', () => {
     });
 
     it('should cancel deletion of task', () => {
-        const inputBox = document.querySelector('#input');
-        const addButton = document.querySelector('#add');
     
-        inputBox.value = 'Task to be deleted';
-        addButton.click();
+        addTask('Task to be deleted');
     
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
@@ -2420,11 +2393,8 @@ describe('Editing a Task', () => {
 
 
     it('should edit a task', () => {
-        const inputBox = document.querySelector('#input');
-        const addButton = document.querySelector('#add');
     
-        inputBox.value = 'Task to be edited';
-        addButton.click();
+        addTask('Task to be edited');
     
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
@@ -2462,11 +2432,9 @@ describe('Editing a Task', () => {
 
 
     it('should cancel edit a task after editing', () => {
-        const inputBox = document.querySelector('#input');
-        const addButton = document.querySelector('#add');
+
     
-        inputBox.value = 'Task to be edited';
-        addButton.click();
+        addTask('Task to be edited');
     
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
@@ -2496,11 +2464,8 @@ describe('Editing a Task', () => {
     });
 
     it('should not edit a task that is empty', () => {
-        const inputBox = document.querySelector('#input');
-        const addButton = document.querySelector('#add');
     
-        inputBox.value = 'Task to be edited';
-        addButton.click();
+        addTask('Task to be edited');
     
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
@@ -2530,14 +2495,10 @@ describe('Editing a Task', () => {
     });
 
     it('should not edit a task to a task that already exists', () => {
-        const inputBox = document.querySelector('#input');
-        const addButton = document.querySelector('#add');
-    
-        inputBox.value = 'Existing Task';
-        addButton.click();
 
-        inputBox.value = 'Task to be edited';
-        addButton.click();
+        addTask('Existing Task');
+
+        addTask('Task to be edited');
     
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[1].id;
@@ -2568,11 +2529,7 @@ describe('Editing a Task', () => {
 
     it('should not be able to edit completed task', () => {
 
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-        
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
+        addTask('Task 1');
         
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
@@ -2607,9 +2564,8 @@ describe('Cancel editing of Task', () => {
     it('should cancel edit a task', () => {
         const inputBox = document.querySelector('#input');
         const addButton = document.querySelector('#add');
-    
-        inputBox.value = 'Task to be edited';
-        addButton.click();
+
+        addTask('Task to be edited');
     
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
@@ -2641,11 +2597,8 @@ describe('Change completed status', () => {
 
 
     it('should change completed status when clicked', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-        
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
+
+        addTask('Task 1');
 
         const tasks = getLocalStorageItem('tasks');
         expect(tasks[0].completed).toBeFalsy();
@@ -2660,11 +2613,8 @@ describe('Change completed status', () => {
     });
 
     it('should change completed status when clicked', () => {
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-        
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
+
+        addTask('Task 1');
 
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
@@ -2683,13 +2633,8 @@ describe('Clear tasks', () => {
 
     it('should clear all tasks', () => {
 
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
+        addTask('Task 1');
         
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
-        
-
         const clearButton = document.querySelector(`#clear`);
         clearButton.click()
 
@@ -2705,13 +2650,8 @@ describe('Clear tasks', () => {
 
     it('should not clear all tasks when canceled', () => {
 
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
+        addTask('Task 1');
         
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
-        
-
         const clearButton = document.querySelector(`#clear`);
         clearButton.click()
 
@@ -2733,15 +2673,9 @@ describe('Clear tasks', () => {
 
     it('should clear In Progress tasks', () => {
 
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
+        addTask('Task 1');
 
-        
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
-
-        inputBox.value = 'Task 2';
-        form.dispatchEvent(new Event('submit'));
+        addTask('Task 2');
 
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
@@ -2762,24 +2696,13 @@ describe('Clear tasks', () => {
         expect(tasksclear).toHaveLength(1);
         expect(tasksclear[0].text).toBe('Task 1')
 
-        
-        
-        
-
     });
 
-    it('should clear Completed tasks', () => {
+    it('should clear Completed tasks', () => {    
         
-        
-        
-        const inputBox = document.querySelector('#input');
-        const form = document.querySelector('form');
-       
-        inputBox.value = 'Task 1';
-        form.dispatchEvent(new Event('submit'));
+        addTask('Task 1');
 
-        inputBox.value = 'Task 2';
-        form.dispatchEvent(new Event('submit'));
+        addTask('Task 2');
 
         const tasks = getLocalStorageItem('tasks');
         const taskId = tasks[0].id;
