@@ -15,18 +15,6 @@ function generateRandomString(options) {
     return chance.string(options);
 }
 
-function notificationTest (text, color){
-
-    let notification = document.querySelector('.notification');
-
-    expect(notification.textContent).toBe(text);
-    const style = window.getComputedStyle(notification);
-    expect(style.backgroundColor).toBe(color);
-    expect(style.visibility).toBe('visible');
-
-    
-}
-
 function generateTasks(param, randomText = true, statuses = false) {
 
     const tasks = [];
@@ -55,6 +43,18 @@ function objectsOfArray(taskArray) {
     return Object.assign({}, ...taskArray);
 }
 
+function notificationTest (text, color){
+
+    let notification = document.querySelector('.notification');
+
+    expect(notification.textContent).toBe(text);
+    const style = window.getComputedStyle(notification);
+    expect(style.backgroundColor).toBe(color);
+    expect(style.visibility).toBe('visible');
+
+    
+}
+
 const setLocalStorageItem = (key, value) => {
     localStorage.setItem(key, value);
 };
@@ -76,341 +76,223 @@ const clearLocalStorage = () => {
     localStorage.clear();
 };
 
+
+
 //* Test Cases
 
 describe('HTML', () => {
 
-function checkElementAttributes(selector, attributes) {
-    const element = document.querySelector(selector);
-    expect(element).toBeTruthy();
-    Object.keys(attributes).forEach(attr => {
-        expect(element.getAttribute(attr)).toBe(attributes[attr]);
-    });
-    return element;
-}
-    
+    function checkElement(selector, attributes) {
+        const element = document.querySelector(selector);
+        expect(element).toBeTruthy();
+        Object.keys(attributes).forEach(attr => {
+            expect(element.getAttribute(attr)).toBe(attributes[attr]);
+        });
+        return element;
+    }
 
+    function checkStyles(selector, expectedStyles) {
+        const element = document.querySelector(selector);
+        expect(element).toBeTruthy();
+        const styles = window.getComputedStyle(element);
+        Object.keys(expectedStyles).forEach(style => {
+            expect(styles[style]).toBe(expectedStyles[style]);
+        });
+    }
 
-
-beforeEach(() => {
-    
-    const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
-    const cssContent = fs.readFileSync(path.resolve(__dirname, './css/style.css'), 'utf8');
-    
-    document.body.innerHTML = html;
-    
-    const styleElement = document.createElement('style');
-    styleElement.textContent = cssContent;
-    document.head.appendChild(styleElement);
-
-    jest.resetModules();
-
-});
-     
-describe('HTML-File Section', () => {
-
-    beforeEach(() => {
-        file = document.querySelector('*');
-    });
-
-    it('should have font family as "Arial,sans-serif"', () => {
-    
-        const style = window.getComputedStyle(file);
-
-        expect(file).toBeTruthy();
-        expect(style.fontFamily).toBe('Arial,sans-serif'); 
-    });
-});
-
-describe('HTML-Body Section', () => {
-
-    beforeEach(() => {
-
-        body = document.querySelector('body');
-        mainDiv = document.querySelector('.main');
-        noti = document.querySelector('.notification');
-        toastDiv = document.querySelector('#toast-container');
-        script = document.querySelector('script');
-
-    });
-
-    it('should have all elements in body', () => {
-        expect(body).toBeTruthy();
-        expect(body.contains(mainDiv)).toBe(true);
-        expect(body.contains(noti)).toBe(true);
-        expect(body.contains(toastDiv)).toBe(true);
-        expect(body.contains(script)).toBe(true);
-
-        const styles = window.getComputedStyle(mainDiv);
-
-        expect(mainDiv).toBeTruthy();
-        expect(styles.backgroundImage).toBe("url(../img/back2.jpg)");
-    });
-
-});    
-
-
-describe('HTML-ToDo Section', () => {
-
-    beforeEach(() => {
-
-        todoDiv = document.querySelector('.todo');
-        header = document.querySelector('header');
-        h1Element = header.querySelector('h1');
-
-    });
-
-    it('should have all elements in ToDo Div', () => {
+    function checkContains(containerSelector, childSelectors) {
+        const container = document.querySelector(containerSelector);
+        expect(container).toBeTruthy();
+        childSelectors.forEach(childSelector => {
+            const child = document.querySelector(childSelector);
+            expect(container.contains(child)).toBe(true);
+        });
+    }
         
-        const stylesToDo = window.getComputedStyle(todoDiv);
-        const styles = window.getComputedStyle(header);
-
-        expect(todoDiv).toBeTruthy();
-        expect(header).toBeTruthy();
-        expect(header.contains(h1Element)).toBe(true);
-        expect(stylesToDo.backgroundColor).toBe('rgba(212, 174, 236, 0.801)');
-        expect(h1Element.textContent).toBe('To-Do Planner!');
-        expect(styles.color).toBe('rgb(63, 20, 119)');
-          
-    });
-});
-
-
-describe('HTML-Task Input Section', () => {
-
     beforeEach(() => {
+        
+        const html = fs.readFileSync(path.resolve(__dirname, './index.html'), 'utf8');
+        const cssContent = fs.readFileSync(path.resolve(__dirname, './css/style.css'), 'utf8');
+        
+        document.body.innerHTML = html;
+        
+        const styleElement = document.createElement('style');
+        styleElement.textContent = cssContent;
+        document.head.appendChild(styleElement);
 
-        taskFieldDiv = document.querySelector('.taskfield');
-        taskInputDiv = document.querySelector('.taskinput');
-
+        jest.resetModules();
 
     });
 
-    it('should have all elements in task input Div', () => {
+    describe('HTML-File Section', () => {
 
-
-        expect(taskFieldDiv).toBeTruthy();
-        expect(taskInputDiv).toBeTruthy();
-        const form = document.querySelector('.taskinput form');
-        expect(form).toBeTruthy();
-
-        checkElementAttributes('#input', {
-            type: 'text',
-            id: 'input',
-            placeholder: 'Enter your tasks...',
-            autocomplete: 'off',
-            maxLength: '150'
-        });
-
-        checkElementAttributes('#add', {
-            type: 'submit',
-            id: 'add',
-            title: 'Add'
-        });
-
-        checkElementAttributes('#add img', {
-            alt: 'add icon'
-
+        it('should have font family as "Arial,sans-serif"', () => {
+            checkStyles('*', {
+                fontFamily: 'Arial,sans-serif'
+            });
         });
     });
 
-    
-    // it('should have all elements in task input Div', () => {
+    describe('HTML-Body Section', () => {
+
+        it('should have all elements in body', () => {
+            checkContains('body', ['.main', '.notification', '#toast-container', 'script']);
+            checkStyles('.main', {
+                backgroundImage: "url(../img/back2.jpg)"
+            });
+        });
+    });
+
+    describe('HTML-Header Section', () => {
+
+        it('should have all elements in ToDo Div', () => {
+            checkContains('.todo', ['header']);
+            checkStyles('.todo', {
+                backgroundColor: 'rgba(212, 174, 236, 0.801)'
+            });
+            expect(document.querySelector('header h1').textContent).toBe('To-Do Planner!');
+            checkStyles('header', {
+                color: 'rgb(63, 20, 119)'
+            });
+        });
+    });
+
+    describe('HTML-Task Input Section', () => {
+
+        it('should have all elements in task input Div', () => {
+            
+            checkContains('.taskfield', ['.taskinput']);
+            checkElement('.taskinput form', {});
+            const inputField = checkElement('#input', {
+                type: 'text',
+                id: 'input',
+                placeholder: 'Enter your tasks...',
+                autocomplete: 'off',
+                maxLength: '150'
+            });
+            expect(inputField.disabled).toBe(false);
+
+            const addBtn = checkElement('#add', {
+                type: 'submit',
+                id: 'add',
+                title: 'Add'
+            });
+            expect(addBtn.disabled).toBe(false);
+
+            const addBtnImg = document.querySelector('#add img');
+            expect(addBtn.contains(addBtnImg)).toBe(true);
+            expect(addBtnImg.src).toContain('img/taskadd.png');
+            checkElement('#add img', {
+                alt: 'add icon'
+            });
+        });
+    });
+
+    describe('HTML-Task Filter Section', () => {
+
+        it('should have all elements in tasks filter Div', () => {
+            checkContains('.taskfilterclr', ['#all', '#labelall', '#inprogress', '#labelinprogress', '#completed', '#labelcompleted']);
+            
+            const allRadioBtn = checkElement('#all', {value: 'all'});
+            expect(allRadioBtn.disabled).toBe(false);
+            const allRadioLabel = document.querySelector('#labelall');
+            expect(allRadioLabel.textContent).toBe('All');
+            checkElement('#labelall', {
+                for: 'all',
+                title: 'All'
+            });
+
+            const inProgressRadioBtn = checkElement('#inprogress', {value: 'inprogress'});
+            expect(inProgressRadioBtn.disabled).toBe(false);
+            const inprogressRadioLabel = document.querySelector('#labelinprogress');
+            expect(inprogressRadioLabel.textContent).toBe('In Progress');
+            checkElement('#labelinprogress', {
+                for: 'inprogress',
+                title: 'In Progress'
+            });
+
+            const completedRadioBtn = checkElement('#completed', {value: 'completed'});
+            expect(completedRadioBtn.disabled).toBe(false);
+            const completedRadioLabel = document.querySelector('#labelcompleted');
+            expect(completedRadioLabel.textContent).toBe('Completed');
+            checkElement('#labelcompleted', {
+                for: 'completed',
+                title: 'Completed'
+            });
+        });
+    });
+
+    describe('HTML-No Tasks Section', () => {  
         
+        it('should have all elements in no tasks Div', () => {
+            checkContains('.notasks', ['.notaskcontent']);
+            checkContains('.notaskcontent', ['.notaskcontent img', '.notaskcontent h2']);
 
-    //     expect(taskInputDiv.contains(form)).toBe(true);
-    //     expect(form.contains(inputField) && form.contains(addBtn)).toBe(true);
-    //     expect(inputField.type).toBe('text');
-    //     expect(inputField.id).toBe('input');
-    //     expect(inputField.placeholder).toBe('Enter your tasks...');   
-    //     expect(inputField.autocomplete).toBe('off');  
-    //     expect(inputField.maxLength).toBe(150); 
-    //     expect(inputField.textContent).toBe('');
-    //     expect(addBtn.type).toBe('submit');
-    //     expect(addBtn.id).toBe('add');
-    //     expect(addBtn.title).toBe('Add');
-    //     expect(addBtn.disabled).toBe(false);
-    //     expect(addBtn.contains(addBtnImg)).toBe(true);
-    //     expect(addBtnImg.src).toContain('img/taskadd.png');
-    //     expect(addBtnImg.alt).toBe('add icon'); 
-
-    // });
-
-});
-
-describe('HTML-Task Filter Section', () => {
-
-    beforeEach(() => {
-
-        inputradio= document.querySelector('.taskfilterclr input')
-        taskTextDiv = document.querySelector('.tasktext');
-        taskFilterClr = document.querySelector('.taskfilterclr');
-        taskFilterInputs = document.querySelectorAll('.taskfilterclr input');
-        allRadioBtn = taskFilterClr.querySelector('#all');
-        allRadioLabel= taskFilterClr.querySelector('#labelall');
-        inprogressRadioBtn = taskFilterClr.querySelector('#inprogress');
-        inprogressRadioLabel= taskFilterClr.querySelector('#labelinprogress');
-        completedRadioBtn = taskFilterClr.querySelector('#completed');
-        completedRadioLabel= taskFilterClr.querySelector('#labelcompleted');
-
+            const noTaskImg = document.querySelector('.notaskcontent img');
+            expect(noTaskImg.src).toContain('img/notask.png');
+            expect(noTaskImg.alt).toBe('notask image'); 
+            expect(document.querySelector('.notaskcontent h2').textContent).toBe('Add tasks to begin!!');
+        }); 
     });
 
-    it('should have all elements in tasks filter Div', () => {
+    describe('HTML-Task List Section', () => {
 
-        expect(taskTextDiv).toBeTruthy();
-        expect(taskFilterClr).toBeTruthy();
-        expect(inputradio.type).toBe('radio');
-        expect(inputradio.name).toBe('taskFilter');
+        it('should have all elements in Task List Div', () => {
+            checkContains('.tasklist', ['.taskdisplay']);
+            checkContains('.taskdisplay', ['#listtask']);
+            expect(document.querySelector('#listtask').textContent).toBe('');
 
-        expect(allRadioBtn).toBeTruthy();
-        expect(allRadioLabel).toBeTruthy();
-        expect(taskFilterClr.contains(allRadioBtn) && taskFilterClr.contains(allRadioLabel)).toBe(true);
-        expect(allRadioBtn.disabled).toBe(false);
-        expect(allRadioBtn.value).toBe('all');
-        expect(allRadioLabel.textContent).toBe('All');
-        expect(allRadioLabel.getAttribute('for')).toBe('all');
-        expect(allRadioLabel.title).toBe('All');
-
-        expect(inprogressRadioBtn).toBeTruthy();
-        expect(inprogressRadioLabel).toBeTruthy();
-        expect(taskFilterClr.contains(inprogressRadioBtn) && taskFilterClr.contains(inprogressRadioLabel)).toBe(true);
-        expect(inprogressRadioBtn.disabled).toBe(false);
-        expect(inprogressRadioBtn.getAttribute('value')).toBe('inprogress');
-        expect(inprogressRadioLabel.textContent).toBe('In Progress');
-        expect(inprogressRadioLabel.getAttribute('for')).toBe('inprogress');
-        expect(inprogressRadioLabel.title).toBe('In Progress');
-        
-        expect(completedRadioBtn).toBeTruthy();
-        expect(completedRadioLabel).toBeTruthy();
-        expect(taskFilterClr.contains(completedRadioBtn) && taskFilterClr.contains(completedRadioLabel)).toBe(true);
-        expect(completedRadioBtn.disabled).toBe(false);
-        expect(completedRadioBtn.value).toBe('completed');   
-        expect(completedRadioLabel.textContent).toBe('Completed');
-        expect(completedRadioLabel.getAttribute('for')).toBe('completed');
-        expect(completedRadioLabel.title).toBe('Completed');
-    });
-});
-
-describe('HTML-No Tasks Section', () => {  
-    
-    beforeEach(() => {
-
-        noTasksDiv = document.querySelector('.notasks');
-        noTaskContentDiv = document.querySelector('.notaskcontent');
-        noTaskImg = noTaskContentDiv.querySelector('img');
-        noTaskText = noTaskContentDiv.querySelector('h2');
+        });
     });
 
-    it('should have all elements in no tasks Div', () => {
-        expect(noTasksDiv).toBeTruthy();
-        expect(noTaskContentDiv).toBeTruthy();
-        expect(noTaskContentDiv.contains(noTaskImg)).toBe(true);
-        expect(noTaskContentDiv.contains(noTaskText)).toBe(true);
-        expect(noTaskImg.src).toContain('img/notask.png');
-        expect(noTaskImg.alt).toBe('notask image'); 
-        expect(noTaskText.textContent).toBe('Add tasks to begin!!');
-    }); 
-});
+    describe('HTML-Task Count and Clear Section', () => {
 
-describe('HTML-Task List Section', () => {
+        it('should have all elements in Task count and clear Message Div', () => {
+            checkContains('.clear', ['#clear', '.count']);
+            checkContains('.count', ['h3']);
+            expect(document.querySelector('h3').textContent).toBe('You have no tasks here!');
 
-    beforeEach(() => {
-
-        taskListDiv = document.querySelector('.tasklist');
-        taskDisplayDiv = document.querySelector('.taskdisplay');
-        ul = document.querySelector('#listtask');
+            const clearBtn = document.querySelector('#clear');
+            expect(clearBtn.disabled).toBe(false);
+            expect(clearBtn.title).toBe('Clear'); 
+            expect(clearBtn.textContent).toBe('Clear Tasks');
+        });
     });
 
-    it('should have all elements in Task List Div', () => {
-        expect(taskListDiv).toBeTruthy();
-        expect(taskDisplayDiv).toBeTruthy();
-        expect(ul).toBeTruthy();
-        expect(taskDisplayDiv.contains(ul)).toBe(true);
+    describe('HTML-Notification Message Section', () => {
+
+        it('should have all elements in notification Message Div', () => {
+            checkElement('body p', {
+                class: 'notification'
+            });
+            checkStyles('body p', {
+                visibility: 'hidden'
+            });
+            expect(document.querySelector('body p').textContent).toBe('');
+        });
     });
 
+    describe('HTML-Toast Message Section', () => {
+        it('should have all elements in Toast Message Div', () => {
+            checkContains('#toast-container', ['.toast-message', '#message-text', '.button-container']);
+            checkContains('.button-container', ['#confirm-button', '#cancel-button', '.button-container h3']);
 
-});
+            const confirmBtn = document.querySelector('#confirm-button');
+            expect(confirmBtn.textContent).toBe('Yes');
+            expect(confirmBtn.disabled).toBe(false);
 
-describe('HTML-Task Count and Clear Section', () => {
-
-    beforeEach(() => {
-
-        clearDiv = document.querySelector('.clear');
-        countDiv = document.querySelector('.count');
-        h3Element = document.querySelector('h3');
-        clearBtn = document.querySelector('.clear #clear');
-
-
+            const cancelBtn = document.querySelector('#cancel-button') 
+            expect(cancelBtn.textContent).toBe('No');
+            expect(cancelBtn.disabled).toBe(false);
+        });  
     });
 
-    it('should have all elements in Task count and clear Message Div', () => {
-        expect(clearDiv).toBeTruthy();
-        expect(countDiv).toBeTruthy();
-        expect(countDiv.contains(h3Element)).toBe(true);
-        expect(h3Element.textContent).toBe('You have no tasks here!');
-        expect(clearBtn).toBeTruthy();
-        expect(clearBtn.disabled).toBe(false);
-        expect(clearBtn.disabled).toBeFalsy();
-        expect(clearBtn.title).toBe('Clear'); 
-        expect(clearBtn.textContent).toBe('Clear Tasks');
+    describe('HTML-Script Section', () => {
+        it('should have the source file', () => {
+            const script = document.querySelector('script');
+            expect(script.src).toContain('script.js');
+        });
     });
-});
-
-describe('HTML-Notification Message Section', () => {
-
-    beforeEach(() => {
-        notiTag = document.querySelector('body p');
-        style = window.getComputedStyle(notiTag);
-    })
-
-    it('should have all elements in notification Message Div', () => {
-    
-        expect(notiTag).toBeTruthy();
-        expect(notiTag.getAttribute('class')).toBe('notification');
-        expect(style.visibility).toBe('hidden');
-        expect(notiTag.textContent).toBe('');
-    })
-
-});
-
-describe('HTML-Toast Message Section', () => {
-
-    beforeEach(() => {
-        toastDiv = document.querySelector('#toast-container');
-        toastMsgDiv = document.querySelector('.toast-message');
-        toastSpan = document.querySelector('#message-text');
-        toastBtn = document.querySelector('.button-container');
-        toasth3 = document.querySelector('.button-container h3');
-        confirmBtn = document.querySelector('#confirm-button');
-        cancelBtn = document.querySelector('#cancel-button');
-    })
-
-    it('should have all elements in Toast Message Div', () => {
-
-        expect(toastDiv).toBeTruthy();
-        expect(toastMsgDiv).toBeTruthy();
-        expect(toastMsgDiv.contains(toastSpan)).toBe(true);
-        expect(toastMsgDiv.contains(toastBtn)).toBe(true);
-        expect(toastBtn.contains(confirmBtn)).toBe(true);
-        expect(toastBtn.contains(cancelBtn)).toBe(true);
-        expect(toastBtn.contains(toasth3)).toBe(true);
-        expect(toastBtn.contains(toasth3)).toBe(true);
-        expect(confirmBtn.textContent).toBe('Yes');
-        expect(confirmBtn.disabled).toBe(false);
-        expect(cancelBtn.textContent).toBe('No');
-        expect(cancelBtn.disabled).toBe(false);
-    });  
-});
-
-describe('HTML-Script Section', () => {
-
-    it('should have the source file', () => {
-        const script = document.querySelector('script');
-        expect(script.src).toContain('script.js');
-    });
-});
-    
-
 
 });
 
@@ -464,7 +346,6 @@ describe('Unit Tests', () => {
     afterEach(() => {
         localStorage.clear();
     });
-
 
     describe('DOM content load', () => {
 
