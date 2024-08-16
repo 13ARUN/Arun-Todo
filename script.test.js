@@ -76,8 +76,6 @@ const clearLocalStorage = () => {
     localStorage.clear();
 };
 
-
-
 //* Test Cases
 
 describe('HTML', () => {
@@ -1819,89 +1817,76 @@ describe('Unit Tests', () => {
     });
 
     //*
-    describe('ToggleTaskControls function', () => {
+    describe('toggleTaskControls function', () => {
 
         beforeEach(() => {
-
             const sampleTasks = generateTasks(2, true, false);
             setLocalStorageItem('tasks', JSON.stringify(sampleTasks));
             renderTasks();
-
         });
-
-
-        it('should hide the edit div and show the save div', () => {
-
-            toggleTaskControls(1, 'edit', 'save');
-
-            const fromDiv = document.querySelector('#edit-1');
-            const toDiv = document.querySelector('#save-1');
-
-            expect(fromDiv.style.display).toBe('none');
-            expect(toDiv.style.display).toBe('flex');
-
+    
+        it('should show the edit div and hide the save div when showEdit is true', () => {
+            toggleTaskControls(1, true);
+    
+            const editDiv = document.querySelector('#edit-1');
+            const saveDiv = document.querySelector('#save-1');
+    
+            expect(editDiv.style.display).toBe('flex');
+            expect(saveDiv.style.display).toBe('none');
         });
-
     
-        it('should hide the save div and show the edit div', () => {
-            
-            toggleTaskControls(1, 'save', 'edit');
+        it('should show the save div and hide the edit div when showEdit is false', () => {
+            toggleTaskControls(1, false);
     
-            const fromDiv = document.querySelector('#save-1');
-            const toDiv = document.querySelector('#edit-1');
-
-            expect(fromDiv.style.display).toBe('none');
-            expect(toDiv.style.display).toBe('flex');
+            const editDiv = document.querySelector('#edit-1');
+            const saveDiv = document.querySelector('#save-1');
+    
+            expect(editDiv.style.display).toBe('none');
+            expect(saveDiv.style.display).toBe('flex');
         });
     
         it('should handle cases where both elements are initially not visible', () => {
-
-            const fromDiv = document.querySelector('#edit-1');
-            fromDiv.style.display = 'none';
-            const toDiv = document.querySelector('#save-1');
-            toDiv.style.display = 'none';
-        
-            toggleTaskControls(1, 'edit', 'save');
-        
-            expect(fromDiv.style.display).toBe('none');
-            expect(toDiv.style.display).toBe('flex');
+            const editDiv = document.querySelector('#edit-1');
+            editDiv.style.display = 'none';
+            const saveDiv = document.querySelector('#save-1');
+            saveDiv.style.display = 'none';
+    
+            toggleTaskControls(1, true);
+    
+            expect(editDiv.style.display).toBe('flex');
+            expect(saveDiv.style.display).toBe('none');
         });
     
         it('should handle cases where both elements are initially visible', () => {
-            
-        
-            const fromDiv = document.querySelector('#edit-1');
-            fromDiv.style.display = 'flex';
-            const toDiv = document.querySelector('#save-1');
-            toDiv.style.display = 'flex';
-        
-            toggleTaskControls(1, 'edit', 'save');
-        
-            expect(fromDiv.style.display).toBe('none');
-            expect(toDiv.style.display).toBe('flex');
-        });
-
-        it('should hide the edit element and show the save element of multiple tasks', () => {
-
-            toggleTaskControls(1, 'edit', 'save');
-            toggleTaskControls(1, 'save', 'edit');
-            toggleTaskControls(2, 'edit', 'save');
-            
-
-            const fromDiv = document.querySelector('#edit-1');
-            const toDiv = document.querySelector('#save-1');
-
-            const fromDiv2 = document.querySelector('#edit-2');
-            const toDiv2 = document.querySelector('#save-2');
+            const editDiv = document.querySelector('#edit-1');
+            editDiv.style.display = 'flex';
+            const saveDiv = document.querySelector('#save-1');
+            saveDiv.style.display = 'flex';
     
-
-            expect(fromDiv.style.display).toBe('flex');
-            expect(toDiv.style.display).toBe('none');
-
-            expect(fromDiv2.style.display).toBe('none');
-            expect(toDiv2.style.display).toBe('flex');
+            toggleTaskControls(1, false);
+    
+            expect(editDiv.style.display).toBe('none');
+            expect(saveDiv.style.display).toBe('flex');
         });
+    
+        it('should toggle controls for multiple tasks correctly', () => {
+            toggleTaskControls(1, false);
+            toggleTaskControls(1, true);
+            toggleTaskControls(2, true);
+    
+            const editDiv1 = document.querySelector('#edit-1');
+            const saveDiv1 = document.querySelector('#save-1');
+            const editDiv2 = document.querySelector('#edit-2');
+            const saveDiv2 = document.querySelector('#save-2');
+    
+            expect(editDiv1.style.display).toBe('flex');
+            expect(saveDiv1.style.display).toBe('none');
+            expect(editDiv2.style.display).toBe('flex');
+            expect(saveDiv2.style.display).toBe('none');
+        });
+    
     });
+    
 
 
 

@@ -1,13 +1,24 @@
+//* Query Selectors
 const inputBox = document.querySelector('#input') //? Task input field
+const taskList = document.querySelector('#listtask'); //? List of Tasks
+const taskCountText = document.querySelector('.count h3'); //? Task Count Text
 
+const noTasks = document.querySelector('.notasks'); 
+const showtask = document.querySelector('.tasklist'); 
+const taskActions = document.querySelector('.tasktext'); 
+const countText = document.querySelector('.clear');
+
+//* Global Variable to store Task Counts
 let taskIdCounter = parseInt(localStorage.getItem('taskIdCounter')) || 0; //? ID counter variable for tasks
 
+//* Render the page with the Saved filter and its Tasks
 document.addEventListener('DOMContentLoaded', () => { 
     const savedFilter = localStorage.getItem('statusFilter') || 'all';
     document.querySelector(`input[value="${savedFilter}"]`).checked = true;
     renderTasks(savedFilter); 
 });
 
+//* Re-Render page based on filter clicked
 document.querySelectorAll('input[name="taskFilter"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
         const filter = e.target.value;
@@ -16,62 +27,56 @@ document.querySelectorAll('input[name="taskFilter"]').forEach(radio => {
     });
 });
 
-inputBox.addEventListener('blur', () => {
-    inputBox.style.borderBottom = 'none'; // Remove border style when not focused
-});
-
-inputBox.addEventListener('input', () => {
-    inputBox.style.borderBottom = 'none'; // Remove border style when typed
-});
-
+//* Add a new Task on submission
 document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
     addTask();
 });
 
-document.querySelectorAll('input[name="taskFilter"]').forEach(radio => {
-    radio.addEventListener('change', (event) => {
-        filterTasks(event.target.value);
+//* UX 
+['blur', 'input'].forEach(event => {
+    inputBox.addEventListener(event, () => {
+        inputBox.style.borderBottom = 'none'; // Remove border style on blur or input
     });
 });
 
+//* Clear tasks
 document.getElementById('clear').addEventListener('click', clearTasks);
 
 
-//* Render Cluster
+//* Render Cluster *//
 
-//!
+//* To Render the Page
+//! 
 function renderTasks() {
 
     const allTasks = localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
     const filter = localStorage.getItem('statusFilter') || 'all';
 
-    clearTaskList(); //! Fn\
-    toggleTaskListVisibility(allTasks); //! Fn
-    displayTaskCounts(allTasks, filter); //! Fn
+    clearTaskList(); //! Fn: Clear existing tasks
+    toggleTaskListVisibility(allTasks); //! Fn: Display based on tasks presence
+    displayTaskCounts(allTasks, filter); //! Fn: Display task counts
 
-    let filteredTasks = filterTasks(allTasks, filter); //! Fn
+    let filteredTasks = filterTasks(allTasks, filter); //! Fn: Filter tasks based on its status
     
     filteredTasks.forEach(task => {
-        renderEachTask(task); //! Fn
+        renderEachTask(task); //! Fn: Rendering a task and its elements
     });   
 }
 
+//* To Clear tasks Html
 //?
 function clearTaskList() {
-
-    const taskList = document.querySelector('#listtask');
     taskList.innerHTML = '';
 }
 
+//* To Display task counts based on filter 
 //?
 function displayTaskCounts(tasks, filter) {
 
     const totalTasks = tasks.length;
     const inProgressTasks = tasks.filter(task => !task.completed).length;
     const completedTasks = totalTasks - inProgressTasks;
-
-    const taskCountText = document.querySelector('.count h3');
 
     switch (filter) {
         case 'inprogress':
@@ -100,6 +105,7 @@ function displayTaskCounts(tasks, filter) {
     }
 }
 
+//* To Filter tasks
 //?
 function filterTasks(tasks, filter) {
 
@@ -113,16 +119,17 @@ function filterTasks(tasks, filter) {
     }
 }
 
+//* To Render each task 
 //!
 function renderEachTask(task) {
 
-    const taskList = document.querySelector('#listtask');
     let aTask = createTaskElement(task); //! Fn
     taskList.appendChild(aTask);
     //taskList.prepend(aTask); 
 
 }
 
+//* To Create a task element with its elements
 //?
 function createTaskElement(task) {
     let aTask = document.createElement("div"); 
@@ -174,15 +181,9 @@ function createTaskElement(task) {
     return aTask;
 }
 
+//* To Change Visibility based on task count
 //?
 function toggleTaskListVisibility(tasks) {
-
-    const noTasks = document.querySelector('.notasks'); 
-    const showtask = document.querySelector('.tasklist'); 
-    const taskActions = document.querySelector('.tasktext'); 
-    const countText = document.querySelector('.clear'); 
-    const taskCountText = document.querySelector('.count h3');
-
 
     if (tasks.length === 0) {
         noTasks.style.display = 'flex'; 
@@ -198,15 +199,16 @@ function toggleTaskListVisibility(tasks) {
 
 }
 
-//* Add Cluster
 
+//* Add Task Cluster
+
+//* To Add a task 
 //!
 function addTask() {
-
-    const inputBox = document.querySelector('#input');
+    
     const inputValue = inputBox.value;
 
-    if (!validateInput(inputValue)) { //! Fn
+    if (!validateInput(inputValue)) { //! Fn: Validate input text
         inputBox.value = "";
         inputBox.style.borderBottom = '2px solid red';
         inputBox.focus();
@@ -225,32 +227,34 @@ function addTask() {
     localStorage.setItem('taskIdCounter', taskIdCounter);
     localStorage.setItem('statusFilter', 'all');
 
-    showNotification('Task added successfully', 'green'); //! Fn
+    showNotification('Task added successfully', 'green'); //! Fn: Show task added notification
     const statusFilter = document.querySelector('input[name="taskFilter"][value="all"]');
     statusFilter.checked = true;
     
-    renderTasks(); //! Fn
+    renderTasks(); //! Fn: Re-Render Tasks
 
     inputBox.value = "";
     inputBox.focus();
 }
 
+//* To Validate the input
 //?
 function validateInput(taskText, currentId = -1) {
 
     if (taskText === '') {
-        showNotification('Task cannot be empty!!', '#b80d0d'); //! Fn
+        showNotification('Task cannot be empty!!', '#b80d0d'); //! Fn: Show task empty notification
         return false;
     } else if (taskText.replace(/\s+/g, ' ') === ' ') {
-        showNotification('Task cannot contain only spaces!', '#b80d0d'); //! Fn
+        showNotification('Task cannot contain only spaces!', '#b80d0d'); //! Fn: Show task not be spaces notification
         return false;
     } else if (isTaskAlreadyExists(taskText.trim().replace(/\s+/g, ' '), currentId)) {
-        showNotification('Task already exists!', '#b80d0d'); //! Fn
+        showNotification('Task already exists!', '#b80d0d'); //! Fn: Show task exists notification
         return false;
     }
     return true;
 }
 
+//* To Check if task already exists
 //?
 function isTaskAlreadyExists(taskText, currentId) { 
 
@@ -258,8 +262,10 @@ function isTaskAlreadyExists(taskText, currentId) {
     return allTasks.some(task => task.text.toLowerCase() === taskText.toLowerCase() && task.id !== currentId); //? Return true if exists
 }
 
+
 //* Status Cluster
 
+//* To Change a task's status
 //!
 function checkBox(taskId) {
 
@@ -269,30 +275,33 @@ function checkBox(taskId) {
     task.completed = !task.completed;
 
     localStorage.setItem('tasks', JSON.stringify(allTasks));
-    renderTasks();
+    renderTasks(); //! Fn: Re-Render Tasks
 }
+
 
 //* Delete Cluster
 
+//* To Delete a task
 //!
 function deleteTask(taskId) {
 
-    showToast('Are you sure you want to delete this task?', () => {
+    showToast('Are you sure you want to delete this task?', () => { //! Fn: To ask for delete confirmation
         
-
         let allTasks = JSON.parse(localStorage.getItem('tasks'));
         allTasks = allTasks.filter(task => task.id !== taskId);
         localStorage.setItem('tasks', JSON.stringify(allTasks));
 
-        showNotification('Task deleted successfully', 'green');
-        renderTasks();
+        showNotification('Task deleted successfully', 'green'); //! Fn: Show task deleted notification
+        renderTasks(); //! Fn: Re-Render Tasks
     }, () => {
-        showNotification('Task deletion canceled', 'red');
+        showNotification('Task deletion canceled', 'red'); //! Fn: Show task deletion canceled notification
     });
 }
 
+
 //* Clear Cluster
 
+//* To Clear tasks
 //!
 function clearTasks() {
     const filter = localStorage.getItem('statusFilter');
@@ -311,7 +320,7 @@ function clearTasks() {
             break;
     }
 
-    showToast(message, () => { //! Function call: To ask for clear confirmation
+    showToast(message, () => { //! Fn: To ask for clear confirmation
         let allTasks;
         allTasks = JSON.parse(localStorage.getItem('tasks'));
         
@@ -334,24 +343,25 @@ function clearTasks() {
                 break;
         }
 
-        showNotification(`${filter.charAt(0).toUpperCase() + filter.slice(1)} tasks cleared!`, 'green'); //! Function call: To show tasks cleared message
+        showNotification(`${filter.charAt(0).toUpperCase() + filter.slice(1)} tasks cleared!`, 'green'); //! Fn: To show tasks cleared message
         renderTasks();
 
     }, () => {
-        showNotification('Task clearing canceled', 'red'); //! Function call: To show task cleared cancel message
+        showNotification('Task clearing canceled', 'red'); //! Fn: To show task cleared cancel message
     });
 }
 
+
 //* Edit Cluster
 
+//* To Toggle to Edit mode
 //!
 function toggleEdit(taskId) {
 
-    const inputBox = document.querySelector('#input');
     inputBox.style.borderBottom = 'none';
 
-    disableOtherElements(true);
-    toggleTaskControls(taskId, 'edit', 'save');
+    disableOtherElements(true); //! Fn: Disable other elements
+    toggleTaskControls(taskId, false); //! Fn: Show Save and Cancel Button
 
     let taskText = document.querySelector(`#onetask-${taskId}`);
     taskText.removeAttribute('readonly');
@@ -365,10 +375,10 @@ function toggleEdit(taskId) {
 
 }
 
+//* To Enabe/Disable other Elements
 //?
 function disableOtherElements(disabled) {
 
-    const inputBox = document.querySelector('#input');
     const addButton = document.querySelector('#add');
     const clearButton = document.querySelector('#clear');
     const allEditButtons = document.querySelectorAll('.editdel button');
@@ -388,7 +398,7 @@ function disableOtherElements(disabled) {
 
 }
 
-
+//* To Save edited task
 //!
 function saveTask(taskId) {
 
@@ -396,7 +406,7 @@ function saveTask(taskId) {
     let taskText = document.querySelector(`#onetask-${taskId}`);
     let editedText = taskText.value;
 
-    if (!validateInput(editedText, taskId)) {
+    if (!validateInput(editedText, taskId)) { //! Fn: Validate edited task text
         taskText.focus();
         return;
     }
@@ -406,9 +416,9 @@ function saveTask(taskId) {
     let task = allTasks.find(task => task.id === taskId);
     task.text = editedText;
     localStorage.setItem('tasks', JSON.stringify(allTasks));
-    showNotification('Task updated successfully!', 'green');
-    toggleSave(taskId);
-    renderTasks();
+    showNotification('Task updated successfully!', 'green'); //! Fn: show update task notification
+    toggleSave(taskId); //! Fn: Toggle back to edit and delete
+    renderTasks(); //! Fn: Re-render Tasks
 
     };
 
@@ -420,6 +430,7 @@ function saveTask(taskId) {
     showToast('Are you sure you want to save changes to this task?', confirmSave, cancelSave);
 }
 
+//* To Cancel Task editing
 //!
 function cancelEdit(taskId) {
 
@@ -429,37 +440,37 @@ function cancelEdit(taskId) {
     let taskText = document.querySelector(`#onetask-${taskId}`);
 
     taskText.value = task.text; 
-    toggleSave(taskId); 
+    toggleSave(taskId); //! Fn: Toggle back to edit and delete
 }
 
+
+//* To Toggle EditDelete and SaveCancel
 //!
 function toggleSave(taskId) {
 
-    disableOtherElements(false);
+    disableOtherElements(false); //!Fn: Enable all elements
 
-    toggleTaskControls(taskId, 'save', 'edit');
+    toggleTaskControls(taskId, true); //!Fn: Toggle backk to edit delete
 
     let taskText = document.querySelector(`#onetask-${taskId}`);
     taskText.setAttribute('readonly', 'true');
     taskText.style.borderStyle = 'none';
 }
 
+//* To Change visibility of EditDelete and SaveCancel
 //?
-function toggleTaskControls(taskId, from, to) {
+function toggleTaskControls(taskId, showEdit) {
 
-    let fromDiv = document.querySelector(`#${from}-${taskId}`);
-    let toDiv = document.querySelector(`#${to}-${taskId}`);
-
-    fromDiv.style.display = 'none';
-    toDiv.style.display = 'flex';
-
-
+    document.querySelector(`#edit-${taskId}`).style.display = showEdit ? 'flex' : 'none';
+    document.querySelector(`#save-${taskId}`).style.display = showEdit ? 'none' : 'flex';
 }
 
 //* Notification and Toast Cluster
 
+//* To Show Notification
 //?
 function showNotification(text = 'Notification', color = 'blue') {
+
     const notification = document.querySelector('.notification');
 
     notification.textContent = text;
@@ -472,6 +483,7 @@ function showNotification(text = 'Notification', color = 'blue') {
     }, 3000);
 }
 
+//* To Show Toast for Confirmations
 //!
 function showToast(message, onConfirm, onCancel) {
 
@@ -479,28 +491,29 @@ function showToast(message, onConfirm, onCancel) {
     const confirmButton = document.getElementById('confirm-button');
     const cancelButton = document.getElementById('cancel-button');
 
-    toggleToast(true);
+    toggleToast(true); //! Fn: Toggle the toast to display Flex
     messageText.textContent = message;
 
     confirmButton.onclick = () => {
         onConfirm();
-        toggleToast(false);
+        toggleToast(false); //! Fn: Toggle the toast to display none
     };
 
     cancelButton.onclick = () => {
         onCancel();
-        toggleToast(false);
+        toggleToast(false); //! Fn: Toggle the toast to display none
     };
 }
 
+//* To Toggle Toast div visisbility
 //?
 function toggleToast(visible) {
     const toastContainer = document.getElementById('toast-container');
     toastContainer.style.display = visible ? 'flex' : 'none';
 }
 
-
 //* Exports
+
 module.exports = {
     renderTasks,
     renderEachTask,
