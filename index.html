@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="background">
+        <main>
+            <header>
+                <h1>To-Do Planner</h1>
+            </header>
+
+            <section class="taskInputSection">
+                <div class="taskInputField">
+                    <form>
+                        <input type="text" id="taskInput" placeholder="Enter your tasks..." maxlength="150" autocomplete="off">
+                        <button type="submit" title="Add" id="taskAddBtn" > <img src="img/taskadd.png" alt="add icon"></button>   
+                    </form> 
+                </div>
+            </section>
+
+            <section class="errorMsgSection">
+                <div class="errorMsg">
+                    <p>Task</p>
+                </div>
+            </section>
+
+            <section class="taskFilterSection">
+                <div class="taskFilters">
+                    <input type="radio" name="taskFilter" id="all" value="all" >
+                    <label id="labelall" for="all" title="All">All</label>          
+                    <input type="radio" name="taskFilter" id="inprogress" value="inprogress" >
+                    <label id="labelinprogress" for="inprogress" title="In Progress">In Progress</label>                               
+                    <input type="radio" name="taskFilter" id="completed" value="completed">
+                    <label id="labelcompleted" for="completed" title="Completed">Completed</label>                
+                </div>
+            </section>
+
+            <section class="noTasksSection" style="display: none">
+                <div class="noTaskMsg">
+                    <img src="img/notask.png" alt="notask image">
+                    <h2>Add tasks to begin!!</h2>
+                </div>
+            </section>
+
+            <section class="taskListSection" > 
+                <div class="taskDisplay">
+                    <ul id="taskList">
+                        <div class="atask">
+                            <div class="taskContent">
+                                <input type="text" id="onetask-${task.id}" value="Task 1" maxlength="150" readonly="true"> 
+                            </div>
+                            <div class="editdel" id="edit-${task.id}">
+                                <button id="checkbox-${task.id}" title="Status">
+                                    <img src="img/done.png" alt="checkbox">
+                                </button>
+                                <button title="Edit Task">
+                                    <img src="img/edit.png" alt="edit icon">
+                                </button>
+                                <button title="Delete Task">
+                                    <img src="img/delete.png" alt="delete icon">
+                                </button>
+                            </div>
+                            <div class="savecancel" id="save-${task.id}" style="display:none">
+                                <button id="checkbox-${task.id}" title="Status" disabled="true">
+                                    <img src="img/notdone.png" alt="checkbox">
+                                </button>
+                                <button title="Save Task">
+                                    <img src="img/save.png" alt="save icon">
+                                </button> 
+                                <button title="Cancel Edit">
+                                    <img src="img/wrong.png" alt="cancel icon">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="atask">
+                            <div class="taskContent">
+                                <input type="text" id="onetask-${task.id}" value="Task 1" maxlength="150" readonly="true"> 
+                            </div>
+                            <div class="editdel" id="edit-${task.id}">
+                                <button id="checkbox-${task.id}" title="Status">
+                                    <img src="img/done.png" alt="checkbox">
+                                </button>
+                                <button title="Edit Task">
+                                    <img src="img/edit.png" alt="edit icon">
+                                </button>
+                                <button title="Delete Task">
+                                    <img src="img/delete.png" alt="delete icon">
+                                </button>
+                            </div>
+                            <div class="savecancel" id="save-${task.id}" style="display:none">
+                                <button id="checkbox-${task.id}" title="Status" disabled="true">
+                                    <img src="img/notdone.png" alt="checkbox">
+                                </button>
+                                <button title="Save Task">
+                                    <img src="img/save.png" alt="save icon">
+                                </button> 
+                                <button title="Cancel Edit">
+                                    <img src="img/wrong.png" alt="cancel icon">
+                                </button>
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="countClearSection">    
+                <div class="count">
+                    <h3>You have no tasks here!</h3>
+                </div> 
+                <button title="Clear" id="clear">Clear Tasks</button> <!-- Clear all tasks button -->
+            </section>
+
+            <p class="notification" style="visibility: hidden;"></p>
+
+            <section id="toast-container" style="display: none;">
+                <div class="toast-message">
+                    <span id="message-text"></span>
+                    <div class="button-container">
+                        <button id="confirm-button"><h3>Yes</h3></button>
+                        <button id="cancel-button"><h3>No</h3></button>
+                    </div>
+                </div>
+            </section>
+            
+        </main>
+    </div>
+</body>
+</html>
