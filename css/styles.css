@@ -4,13 +4,29 @@
     margin: 0%;
     padding: 0%;
 }
+:root {
+    --primary-color: #3f1477;
+    --secondary-color: #3d008d;
+    --tertiary-color: #e0d1f3;
+    --hover-color: #d7bff7;
+    --background-color: rgba(212, 174, 236, 0.877);
+    --task-field-bg: #d7dbe4;
+    --error-color: red;
+}
 
-html,body{
+* {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+    margin: 0%;
+    padding: 0%;
+}
+
+html, body {
     height: 100%;
     width: 100%;
 }
 
-.background{
+.background {
     height: 100%;
     width: 100%;
     background-image: url('../img/back2.jpg');
@@ -21,16 +37,16 @@ html,body{
     align-items: center;
 }
 
-main{
+main {
     width: 55%;
     height: 75%;
     min-width: 280px;
-    background-color: rgba(212, 174, 236, 0.877);
+    background-color: var(--background-color);
     border-radius: 40px;
 }
 
-header{
-    color: #3f1477;
+header {
+    color: var(--primary-color);
     height: 13%;
     width: 100%;
     display: flex;
@@ -39,7 +55,7 @@ header{
     font-size: large;
 }
 
-.taskInputSection{
+.taskInputSection {
     height: 10%;
     width: 100%;
     display: flex;
@@ -47,17 +63,17 @@ header{
     align-items: center;
 }
 
-.taskInputField{
+.taskInputField {
     width: 80%;
     height: 100%;
     display: flex;
     justify-content: center;
     border-radius: 40px;
-    background-color: #d7dbe4;
+    background-color: var(--task-field-bg);
     padding-left: 3%;
 }
 
-form{
+form {
     width: 100%;
     height: 100%;
     display: flex;
@@ -65,7 +81,7 @@ form{
     align-items: center;
 }
 
-#taskInput{
+#taskInput {
     border: none;
     outline: none;
     background: transparent;
@@ -74,10 +90,10 @@ form{
     font-size: 18px;
 } 
 
-#taskAddBtn{
+#taskAddBtn {
     border: none;
     outline: none;
-    background-color: #461b80;
+    background-color: var(--secondary-color);
     border-radius: 40px;
     height: 100%;
     width: 90px;
@@ -86,16 +102,17 @@ form{
     align-items: center;
     cursor: pointer;
 }
-#taskAddBtn:hover{
-    background-color: #340c68;  
+
+#taskAddBtn:hover {
+    background-color: var(--primary-color);  
 }
 
-#taskAddBtn img{
-    width:28px;
+#taskAddBtn img {
+    width: 28px;
     height: 28px;
 }
 
-.errorMsgSection{
+.errorMsgSection {
     width: 100%;
     height: 5%;
     display: flex;
@@ -103,13 +120,13 @@ form{
     align-items: center;
 }
 
-.errorMsg{
+.errorMsg {
     width: 74%;
-    color: red;
+    color: var(--error-color);
     text-align: center;
 }
 
-.taskFilterSection{
+.taskFilterSection {
     height: 8%;
     width: 100%;
     display: flex;
@@ -117,19 +134,19 @@ form{
     align-items: center;
 }
 
-.taskFilters{
+.taskFilters {
     width: 60%;
     height: 90%;
     display: flex;
     justify-content: space-around;
 }
 
-.taskFilters label{
+.taskFilters label {
     font-weight: bold;
-    color: #3f1477;
+    color: var(--primary-color);
     width: 30%;
     height: 100%;
-    background-color: #e0d1f3;
+    background-color: var(--tertiary-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -139,43 +156,42 @@ form{
     transition: background-color 0.3s ease;
 }
 
-.taskFilters input{
+.taskFilters input {
     display: none;
 }
 
-label:hover{
-    background-color: #d7bff7;   
+label:hover {
+    background-color: var(--hover-color);   
 }
 
 .taskFilters input[type="radio"]:checked + label {
-    background-color: #461b80;
-    color: #e0d1f3; 
+    background-color: var(--secondary-color);
+    color: var(--tertiary-color); 
 }
 
-.noTasksSection{
+.noTasksSection {
     height: 72%;
     width: 100%;
-    
 }
 
-.noTaskMsg{
+.noTaskMsg {
     height: 90%;
     width: 100%;
     border-radius: 30px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items:center;
+    align-items: center;
 }
 
-.noTaskMsg img{
+.noTaskMsg img {
     width: 60%;
     height: 30%;
     object-fit: contain;
 }
 
-.noTaskMsg h2{
-    color: #3f1477;
+.noTaskMsg h2 {
+    color: var(--primary-color);
     height: 20%;
     width: 100%;
     margin-top: 2%;
@@ -184,14 +200,14 @@ label:hover{
     border-radius: 40px;
 }
 
-.taskListSection{
+.taskListSection {
     display: flex;
     width: 100%;
     height: 54%;
     padding: 1% 5% 1% 5%;
 }
 
-.taskDisplay{
+.taskDisplay {
     width: 100%;
     height: 100%;
     margin-left: 5%;
@@ -202,27 +218,30 @@ label:hover{
     align-items: center;
 }
 
-ul{
+ul {
     list-style: none;
     list-style-position: inside;
     height: 100%;
     width: 95%;
     overflow-y: auto;
 }
+
 ul::-webkit-scrollbar {
     display: none;
     width: 5px;               
 } 
+
 ul::-webkit-scrollbar-track {
-    background: #e0d1f3;        
+    background: var(--tertiary-color);        
 }
+
 ul::-webkit-scrollbar-thumb {
-    background-color: #461b80;   
+    background-color: var(--secondary-color);   
     border-radius: 5px; 
 }
 
-.atask{
-    background-color: #e0d1f3;
+.atask {
+    background-color: var(--tertiary-color);
     border-radius: 30px;
     display: flex;
     align-items: center;
@@ -234,11 +253,11 @@ ul::-webkit-scrollbar-thumb {
 }
 
 .atask:hover {
-    background-color: #cdb7eb;
+    background-color: var(--hover-color);
     transform: scale(1.0);
 }
 
-.taskContent{
+.taskContent {
     width: calc(100% - 170px);
     height: 100%;
     display: flex;
@@ -247,7 +266,7 @@ ul::-webkit-scrollbar-thumb {
     padding-left: 3%;
 }
 
-.taskContent input{
+.taskContent input {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -259,7 +278,7 @@ ul::-webkit-scrollbar-thumb {
     font-size: 20px;
 }
 
-.editdel,.savecancel{
+.editdel, .savecancel {
     width: 150px;
     height: 100%;
     display: flex;
@@ -268,11 +287,12 @@ ul::-webkit-scrollbar-thumb {
     border: none;
     outline: none;
 }
-.editdel button,.savecancel button{
+
+.editdel button, .savecancel button {
     height: 70%;
     width: 60%;
     cursor: pointer;
-    background-color: #e0d1f3;
+    background-color: var(--tertiary-color);
     border: none;
     outline: none;
     background: transparent;
@@ -281,24 +301,19 @@ ul::-webkit-scrollbar-thumb {
     justify-content: center;
     align-items: center;
 }
-.editdel button:hover{
-    background-color: #e0d1f3;
+
+.editdel button:hover, .savecancel button:hover {
+    background-color: var(--tertiary-color);
 }
 
-.savecancel button:hover{
-    background-color: #e0d1f3;
-}
-
-.editdel img,.savecancel img{
+.editdel img, .savecancel img {
     width: 60%;
     height: 75%;
     padding: 5%;
-    object-fit:contain;
+    object-fit: contain;
 }
 
-
-
-.countClearSection{
+.countClearSection {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -306,13 +321,13 @@ ul::-webkit-scrollbar-thumb {
     width: 100%;
 }
 
-.count{
+.count {
     width: calc(80% - 120px);
     height: 100%;
 }
 
-.count h3{
-    color: #3f1477;
+.count h3 {
+    color: var(--primary-color);
     width: 100%;
     height: 100%;
     display: flex;
@@ -320,12 +335,12 @@ ul::-webkit-scrollbar-thumb {
     align-items: center; 
 }
 
-#clear{
+#clear {
     font-weight: bold;
-    color: #3f1477;
+    color: var(--primary-color);
     width: 120px;
     height: 70%;
-    background-color: #e0d1f3;
+    background-color: var(--tertiary-color);
     text-align: center;
     border: none;
     outline: none;
@@ -334,26 +349,25 @@ ul::-webkit-scrollbar-thumb {
     font-size: 16px;
 }
 
-#clear:hover{
-    background-color: #d7bff7;   
+#clear:hover {
+    background-color: var(--hover-color);   
 }
 
 .notification {  
-    top:5%;
-    left:40%;
+    top: 5%;
+    left: 40%;
     width: 20%;
     height: 5%;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 20px;
-    color: #d7dbe4;
+    color: var(--task-field-bg);
     font-size: 18px;
     font-weight: bold;
     overflow-wrap: break-word;
     position: fixed;   
 }
-
 
 #toast-container {
     position: fixed;
@@ -361,22 +375,20 @@ ul::-webkit-scrollbar-thumb {
     left: 0;
     width: 100%;
     height: 100%;
-    display: none; /* Initially hide the toast container */
+    display: none;
     align-items: center;
     justify-content: center;
     background-color: #00000086;
     backdrop-filter: saturate(180%) blur(5px);
-    
 }
 
-
 .toast-message {
-    background-color: #e0d1f3; 
-    border: 1px solid #461b80; 
+    background-color: var(--tertiary-color); 
+    border: 1px solid var(--secondary-color); 
     height: 200px;
     width: 400px;
     font-weight: bold;
-    color: #461b80; 
+    color: var(--secondary-color); 
     border-radius: 30px;
     display: flex;
     flex-direction: column;
@@ -391,35 +403,32 @@ ul::-webkit-scrollbar-thumb {
     align-items: center;
     justify-content: center;
     text-align: center;
-    
 }
 
 .toast-message .button-container {
     display: flex;
-    gap: 10%;
+    justify-content: space-around;
+    align-items: center;
     height: 50%;
     width: 100%;
-    display: flex;
-    
-    align-items: begin;
-    justify-content: center;
 }
 
-.toast-message button {
-    margin: 5px;
-    padding: 5px 10px;
+.toast-message .button-container button {
+    background-color: var(--secondary-color);
     border: none;
+    outline: none;
+    color: var(--tertiary-color);
+    font-size: 16px;
     height: 50%;
-    width: 25%;
-    background-color: #461b80; 
-    color: #d7dbe4;
+    width: 30%;
+    border-radius: 20px;
     cursor: pointer;
-    border-radius: 30px;
 }
 
-.toast-message button:hover {
-    background-color: #32105e; 
+.toast-message .button-container button:hover {
+    background-color: var(--primary-color);
 }
+
 
 
 form button:disabled,
